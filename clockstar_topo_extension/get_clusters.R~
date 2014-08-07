@@ -10,7 +10,7 @@ library(ClockstaR2)
 
 # get trees
 
-files.path <- 'sim_k_1/'
+files.path <- 'sim_k_2/'
 
 fasta.names <- paste0(files.path, grep('.fasta', dir(files.path), value = T))
 
@@ -45,7 +45,7 @@ topo.matrix <- function (tree.list){
       for(i in 2:length(tree.list)){
         dist_temp <- sapply(tree.list[1:i-1], function(x) dist.topo(x, tree.list[[i]], method = 'PH85'), USE.NAMES = F)
 	d.mat[i, 1:length(dist_temp)] <- dist_temp
-	print(length(dist_temp))
+	#print(length(dist_temp))
       }
 
      }else if (length(tree.list) <= 3){
@@ -56,10 +56,10 @@ topo.matrix <- function (tree.list){
 }
 
 dist_test <- topo.matrix(nj_trees) / nrow(nj_trees[[1]]$edge)
-hist(dist_test, breaks = 30, col = 3)
+hist(dist_test, breaks = 100, col = 3)
 
 
 mds_test <- cmdscale(as.dist(dist_test), k = 2, eig = F)
 
-clust_1 <- clusGap(mds_test, pam, B = 10, K.max = 50)
+clust_1 <- clusGap(mds_test, clara, B = 10, K.max = 50)
 	  

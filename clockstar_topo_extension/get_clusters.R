@@ -10,7 +10,7 @@ library(ClockstaR2)
 
 # get trees
 
-files.path <- 'sim_k_1/'
+files.path <- 'sim_k_2/'
 
 fasta.names <- paste0(files.path, grep('.fasta', dir(files.path), value = T))
 
@@ -62,4 +62,5 @@ hist(dist_test, breaks = 100, col = 3)
 mds_test <- cmdscale(as.dist(dist_test), k = 2, eig = F)
 
 clust_1 <- clusGap(mds_test, clara, B = 10, K.max = 50)
-	  
+pm1 <- pam(mds_test, k = 2)	  
+plot(mds_test, pch = 20, col = pm1$clustering, cex = 2)
