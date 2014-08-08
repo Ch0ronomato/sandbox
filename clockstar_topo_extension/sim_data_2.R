@@ -52,7 +52,7 @@ pms_subst_trees <- list(tr_sim_1_pm1, tr_sim_1_pm2, tr_sim_2_pm3, tr_sim_2_pm4)
 names(pms_subst_trees) <- c('tr_sim_1_pm1', 'tr_sim_1_pm2', 'tr_sim_2_pm3', 'tr_sim_2_pm4')
 
 for(i in 1:length(pms_subst_trees)){
-  write.tree(pms_subst_trees[[i]], file = paste0(names(pms_subst_trees)[i], '.tree'))
+  write.tree(pms_subst_trees[[i]], file = paste0('sim_k_2/', names(pms_subst_trees)[i], '.tree'))
 }
 
 set.seed(1234)
@@ -64,7 +64,7 @@ segsites <- vector()
 #system('mkdir sim_k_2')
 
 for(i in 1:100){
-  tr_temp <- pms_trees[[pm.sets[i]]]
+  tr_temp <- pms_subst_trees[[pm.sets[i]]]
   tr_temp$edge.length <- abs(tr_temp$edge.length + rnorm(38, 0, 0.002) + rnorm(1, 0, 0.002))
   dat_temp <- as.DNAbin(simSeq(tr_temp, l= 500))
   write.dna(dat_temp, file = paste0('sim_k_2/seq_pm', pm.sets[i], '_', i,  '.fasta'), format = 'fasta', nbcol = -1, colsep = '')

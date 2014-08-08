@@ -10,7 +10,7 @@ library(ClockstaR2)
 
 # get trees
 
-files.path <- 'sim_k_2/'
+files.path <- 'sim_k_3/'
 
 fasta.names <- paste0(files.path, grep('.fasta', dir(files.path), value = T))
 
@@ -45,7 +45,7 @@ topo.matrix <- function (tree.list){
       for(i in 2:length(tree.list)){
         dist_temp <- sapply(tree.list[1:i-1], function(x) dist.topo(x, tree.list[[i]], method = 'PH85'), USE.NAMES = F)
 	d.mat[i, 1:length(dist_temp)] <- dist_temp
-	#print(length(dist_temp))
+	print(paste('The tree distance is', length(dist_temp)))
       }
 
      }else if (length(tree.list) <= 3){
@@ -59,8 +59,11 @@ dist_test <- topo.matrix(nj_trees) / nrow(nj_trees[[1]]$edge)
 hist(dist_test, breaks = 100, col = 3)
 
 
-mds_test <- cmdscale(as.dist(dist_test), k = 2, eig = F)
+mds_test <- cmdscale(as.dist(dist_test), k = 3, eig = F)
 
 clust_1 <- clusGap(mds_test, clara, B = 10, K.max = 50)
-pm1 <- pam(mds_test, k = 2)	  
+pm1 <- pam(mds_test, k = 3)	  
 plot(mds_test, pch = 20, col = pm1$clustering, cex = 2)
+
+library(rgl)
+plot3d(mds_test, col = pm1$clustering, type = 's')
