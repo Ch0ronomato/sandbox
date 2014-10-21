@@ -1,0 +1,4 @@
+from Bio import SeqIO
+handle = open('cpgenomes12.nex', 'rU')
+recs = list(SeqIO.parse(handle, 'nexus'))
+handle.close()
