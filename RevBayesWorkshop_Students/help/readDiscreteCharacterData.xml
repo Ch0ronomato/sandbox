@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="lib/help.xsl" type="text/xsl"?>
+
+<revbayes-help
+	xmlns="http://www.revbayes.org/schema/help-entry"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.revbayes.org/schema/help-entry lib/rb-help-entry.xsd"
+>
+    <function-help-entry>
+    
+        <name>readDiscreteCharacterData</name>
+
+        <title>Read in discrete character data</title>
+    
+        <description>
+            <p>
+            This function reads in discrete character data from a file, and returns it as a data object.
+            </p>
+        </description>
+
+        <usage>
+            <![CDATA[
+             readCharacterData( String file, Bool alwaysReturnAsVector = FALSE )
+             ]]> 
+        </usage>
+    
+        <argument>
+            <label>file</label>
+            <argumentPassingMethod>by-value</argumentPassingMethod>
+            <argumentNodeType>any-DAG-node</argumentNodeType>
+            <description>Filename in the working directory, or a path to a file or folder.</description>
+            <valueType>String</valueType>
+        </argument>
+        <argument>
+            <label>alwaysReturnAsVector</label>
+            <argumentPassingMethod>by-value</argumentPassingMethod>
+            <argumentNodeType>any-DAG-node</argumentNodeType>
+            <description>Boolean specifying whether only multiple data objects or also single ones are returned in vector form.</description>
+            <valueType>Bool</valueType>
+            <defaultValue>FALSE</defaultValue>
+        </argument>
+
+        <returnValue>AbstractDiscreteCharacterData[], ModelObject, RevObject</returnValue>
+
+        <details>
+            <p>
+            This function reads a NEXUS formated data file, ignoring all nexus blocks other than the 'data' block. The data can be DNA nucleotides, amino acid alignments, or standard data.
+            </p>
+            <p>
+	    If several data blocks are encountered in the file, the function returns a vector of data objects.
+            </p>
+        </details>
+
+        <example>
+            <![CDATA[
+             # an executable example of the function described here
+             data <- readDiscreteCharacterData("data/Co1.nex")
+             ]]>
+
+        </example>
+
+        <seeAlso>
+            <!-- The xslt page will try to auto generate links to the referred help entries, therefore only exact names of help items should be listed here (case sensitive) -->
+            <entry>readContinuousCharacterData()</entry>
+        </seeAlso>
+
+
+    </function-help-entry>
+
+</revbayes-help>
+

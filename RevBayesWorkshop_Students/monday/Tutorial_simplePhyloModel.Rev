@@ -1,0 +1,204 @@
+################################################################################
+#
+# RevBayes Exercise: Bayesian inference of phylogeny using a GTR+Gamma+I
+# 
+# This file: Runs the full MCMC of a single partition GTR+Gamma+I model
+#
+################################################################################
+
+# Phylogentic model tutorial: Monday, part 2
+
+# Work through this file by copy-pasting it line by line into RevBayes.
+# Check the progress of the model setup by typing the variable names and pressing enter,
+# by using the str(<variablename>) function, and by listing all objects currently in
+# your workspace with ls().
+# Check the help for the used functions by writing ?<functionname>, e.g. ?mcmc
+# (some help files have not been written yet - you will get an error or empty help file - then just ask a tutor!)
+# (lines starting with # are comments and ignored by RevBayes)
+
+#######################
+# Reading in the Data #
+#######################
+
+# Read in sequence data for three genes in the "Fagus" dataset
+# These files are in NEXUS format - open one of them to check the format. 
+data_ITS <- readDiscreteCharacterData("fagus_ITS.nex")
+data_rbcL <- readDiscreteCharacterData("fagus_rbcL.nex")
+data_matK <- readDiscreteCharacterData("fagus_matK.nex")
+
+# now reate a concatenated data matrix for an unpartitioned analysis
+data <- data_ITS + data_rbcL + data_matK
+
+
+## Type 'data' and 'str(data)' to learn more about the data object thus created
+
+
+######################
+# Substitution Model #
+######################
+
+# specify the GTR+G+I substitution model applied uniformly to all sites
+
+# We will need a counter for the moves ("mi" for Move Iterator) which is incremented each time 
+# we add a move on one of the nodes of our model graph -> see later
+mi = 1		
+
+# 'er' stands for the exchangeability rates (6 under the GTR model)
+
+# constant variable specifying the prior choice for the substitution rates
+er_prior <- v(1,1,1,1,1,1)
+
+# here we define the stochastic variable 'er' which is distributed according to a Dirichlet prior
+er ~ dnDirichlet(er_prior)			
+
+# and we add a move that will change this variable during the MCMC. 
+moves[mi] = mvSimplexElementScale(er)
+mi = mi + 1
+# The specified move "mvSimplexElementScale" scales variables that are of form 'simplex', 
+# i.e., they add up to one.
+# And we need to update our move counter so that we keep track of the number of moves
+# we currently have
+
+# 'pi' stands for the stationary state frequencies of - in our case - the four nucleotides A, C, G, T
+pi_prior <- v(1,1,1,1) 
+pi ~ dnDirichlet(pi_prior)
+moves[mi++] = mvSimplexElementScale(pi)
+# now we use a shortcut for the move counter, by incrementing it when using it. Try this out with
+# another variable, e.g., by typing "a = 0" and return, then "a", then "a++", and finally "a". 
+
+#### create a deterministic variable for the rate matrix ####
+# The function 'fnGTR()' is predefined and creates a matrix of form GTR, based on the stationary state
+# frequencies pi and the instanteneous substitution rates er which we have created before.
+Q := fnGTR(er,pi) 				
+						
+## ??? Question: Why don't we add a move for Q?
+
+
+#############################
+# Among Site Rate Variation #
+#############################
+
+# we aim to model among-site rate variation through a scaled gamma distribution, with parameter alpha.
+# ??? What does a scalded gamma distribution look like?
+# For the alpha parameter, we define a uniform prior between 0.1 (=very uneven rates) and 50 (rates of all sites almost the same)
+alpha_prior_min <- 0.1
+alpha_prior_max <- 50.0
+alpha ~ dnUnif( alpha_prior_min, alpha_prior_max )
+# as a move, we here use a simple scaler (as is adequate for a variable which is simply a positive real value)
+moves[mi++] = mvScale(alpha)
+
+# now we define a deterministic variable which will take the 4 (discretized) categories that approximate the Gamma distribution as defined by alpha
+# ??Why do we have to specify alpha twice in the function call?
+gamma_rates := fnDiscretizeGamma( alpha, alpha, 4, false )
+
+
+# in addition to the Gamma among-site rate variation, we also add a proportion of invariant sites to the model
+# a beta(1,1) prior is added on the proportion of invariant sites
+pinvar ~ dnBeta(1,1)
+# for 'pinvar', we add both a scaler and a slider move, to make this variable converge more quickly (see MCMC lectures and tutorials tomorrow).
+# In RevBayes, we can add as many different moves for each variable as we want, as long as they are suited for the variable type.
+moves[mi++] = mvScale(pinvar)
+moves[mi++] = mvSlide(pinvar)
+
+## ??? Question: What does a beta(1,1) look like, and why is it a good prior for a variable like pinvar?
+
+
+
+###########################################
+# Tree model: Topology and Branch lengths #
+###########################################
+
+# Specify a uniform prior on the tree topology # 
+# this topology prior assumes that all topologies are equally likely (whereas, f.i., a birth-death process would produce more balanced topologies -> see Thursday lecture!)
+# first, we need to get some variables from the data:
+n_species = data.ntaxa()
+names = data.names()
+topology ~ dnUniformTopology(n_species, names)		
+
+# add two topology moves: nearest neighbor interchange and subtree-prune-regraft (see Tuesday lecture!)
+moves[mi++] = mvNNI(topology)				
+moves[mi++] = mvSPR(topology)
+
+# Specify a prior and moves on the branch lengths # 
+# first calculate the number of branches in an unrooted tree
+n_branches <- 2 * n_species - 3					
+
+# now create a random variable for EACH branch length using a 'for' loop
+# the 'a:b' operator used in the 'for' loop creates a sequence of integer numbers between a and b. 
+#'i' takes each of these values through the 'for' loop
+
+for (i in 1:n_branches) {
+
+  br_lens[i] ~ dnExponential(10.0)
+  moves[mi++] = mvScale(br_lens[i])
+
+}
+
+# We used here the exponential distribution with parameter 10.0 as the branch length prior (i.e., expected branch length is 0.1)
+# Add a move for the branch length. We just take a simple scaling move since the values are positive real numbers.
+
+# Define a deterministic variable 'TL' for the tree length (this is just for output).
+TL := sum(br_lens)
+
+# Build the tree by combining the topology with the branch length.
+# Call the treeAssembly function on topology and branches to create a tree variable in RevBayes (different functions for clock trees -> Thursday!)
+phylogeny := treeAssembly(topology, br_lens)
+
+
+###################
+# PhyloCTMC Model #	# PhyloCTMC = Phylogenetic Continuous-Time Markov Chain -> meaning we assume that the sequences evolved on a tree structure
+###################	# according to a continous-time Markov substitution process (the basic assumption of most phylogenetic analyses)
+
+# the sequence evolution model
+# The distribution 'dnPhyloCTMC' assembles a CTMC substitution model based on the phylogeny, Q matrix, among-site rate variation model, and the character type (-> Wednesday)
+# using a branch rate of 1 assures that branch lengths are calculated in substitution per site (and not in any absolute time unit, for which we would need a clock model & calibration -> Thursday) 
+seq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, siteRates=gamma_rates, pInv=pinvar, branchRates=1, type="DNA")
+
+# now we attach our observations = data to the 'seq' object, so that we can calculate the likelihood of the data,
+# given the CTMC substitution model. To do this, we need the "clamp" member function on the seq object:
+seq.clamp(data)
+
+
+#############
+# THE Model #
+#############
+
+# We here specify a name for the model that we have constructed above
+# We can use ANY variable of our model as a 'handle', here we chose to use the rate matrix Q.
+mymodel = model(Q)
+
+##########################
+# Customizing the Output #
+##########################
+# For output, we use 'monitors'. There are three types:
+# Model monitor 'mnModel' prints all (scalar) parameters of our model that can vary
+# File monitor 'mnFile' prints whatever parameter we specify; here, trees are printed
+# Screen monitor 'mnScreen' prints the chosen parameters to the screen (in addition to some standard output like likelihoods and posteriors)
+
+pFile = "fagus_GTR_Gamma_pInv_posterior.log"
+tFile = "fagus_GTR_Gamma_pInv_posterior.trees"
+
+monitors[1] = mnModel(filename=pFile, printgen=100, separator = " ")
+monitors[2] = mnFile(filename=tFile, printgen=100, separator = " ", phylogeny)
+monitors[3] = mnScreen(printgen=10, alpha, TL, pinvar)
+
+
+
+#########################
+# MCMC settings and run #
+#########################
+
+# set up an MCMC object with the model, monitors and moves
+# and then run it... This runs a single independent run, without Metropolis-coupling
+mymcmc = mcmc(mymodel, monitors, moves)
+mymcmc.run(generations=10000)
+
+# This will run for a while. Observe the development of the parameters printed tot he screen through the run
+
+
+# now, we will analyze the tree output. We start by reading in the trees from the tree monitor file, and printing a simple summary of trees and clades
+treetrace = readTreeTrace(tFile, treetype="non-clock", " ") 	
+treetrace.summarize()
+
+# then compute a consensus with a cutoff of 0.5 (or whatever you wish, 1.0=strict, 0.5= Majority-rule, 0.0=all compatible)
+consensusTree(treetrace, "Consensus.tre", 0.5)

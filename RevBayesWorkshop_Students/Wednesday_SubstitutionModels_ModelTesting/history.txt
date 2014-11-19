@@ -1,0 +1,97 @@
+source("Hymenoptera_Partitioning_skeletal.Rev")
+data
+data.ntaxa()
+source("Hymenoptera_Partitioning_skeletal.Rev")
+data.names()
+source("Hymenoptera_Partitioning_skeletal.Rev")
+source("wed.Rev")
+er
+dnUniform
+source("wed.Rev")
+simplex(2, 2, 2)
+source("wed.Rev")
+data[1] <- readDiscreteCharacterData("data_16S.nex")
+source("wed.Rev")
+data
+data[1].ntaxa()
+source("wed.Rev")
+data
+data[2]
+source("wed.Rev")
+data.size()
+source("wed.Rev")
+moves
+br_lens
+br_lens[1]
+str(br_lens[1])
+source("wed.Rev")
+Q_gtr
+norm_gamma_rates
+ data.size()
+data[1]
+data[2]
+data[3]
+source("wed.Rev")
+phylogeny
+phyloSeq
+Q_gtr
+norm_gamma_rates
+phyloSeq[i] ~ dnPhyloCTMC(tree = phylogeny, Q = Q_gtr, siteRates= norm_gamma_rates, ntype="DNA")
+phyloSeq ~ dnPhyloCTMC(tree = phylogeny, Q = Q_gtr, siteRates= norm_gamma_rates, ntype="DNA")
+norm_gamma_rates
+dnPhyloCTMC(tree = phylogeny, Q = Q_gtr, siteRates= norm_gamma_rates, ntype="DNA")
+source("wed.Rev")
+n_parts
+phylogeny
+str(phylogeny)
+phylogeny
+source("wed.Rev")
+dnPhy
+source("wed.Rev")
+phyloSeq
+phyloSeq[i]
+source("wed.Rev")
+Q+gtr[i]
+Q_gtr[i]
+Q_gtr[2]
+Q_gtr[4]
+Q_gtr[6]
+source("wed.Rev")
+vec[1][2] = 7
+vec[1][1] = 7
+vec <- v(dnDirichlet(1, 1, 1, 1, 1), 5)
+vec <- v(5)
+vec <- 4
+vec
+clear()
+vec <- [5, 6, 7]
+clear()
+vec <- [5, 6, dnBernoulli]
+vec <- [5, 6, dnBernoulli()]
+vec <- [5, 6, dnBernoulli(p = 0.5)]
+clear()
+vec <- [5, 6, dnBernoulli(p = 0.5)]
+vec
+clear()
+vec <- v(v(9, 1, 2, 3), v(2, 3, 5))
+vec
+vec[1]
+vec[1][1]
+clear()
+vec[1] <- 5
+vec
+clear()
+vec[1][3] <- 5
+clear()
+vec[1] <- []
+clear()
+vec[1] <- v()
+vec
+vec[1] <- 1
+vec
+vec[1][1]
+vec[1][1] <_ 3
+vec[1][1] <- 3
+vec
+source("wed.Rev")
+q()

@@ -1,0 +1,43 @@
+clear()
+
+d <- readDiscreteCharacterData("test_data_clock_gtr.nex")
+t <- readTrees("true_calib_clk.tre")
+
+# bd priors
+
+# diversification
+div_lambda <- 1.0 / 5.0
+diversification ~ dnExponential(div_lambda)
+diversification.setValue(0.05)
+
+# birth death
+turn_alpha <- 2.0
+turn_beta <- 2.0
+turnover ~ dnBeta(turn_alpha, turn_beta)
+
+denom := abs(1.0 - turnover)
+birth_rate := diversification / (denom)
+death_rate := (turnover * diversification) / (denom)
+
+# Normal prior on the age of the root
+mean_origin <- treeHeight(t[1]) * 1.5
+stdv_origin <- 20.0
+
+origin_time ~ dnNorm(mean_origin, stdv_origin)
+rp_ot := abs(origin_time)
+
+rho <- 1.0
+
+# data variables
+
+n_taxa <- d.ntaxa()
+n_sites <- d.nchar(1)
+names <- d.names()
+
+# tree from bd
+tau ~ dnBDP(lambda = 1.0, mu = 0.12, origin = 619.0, rho = 1.0, samplingStrategy = "uniform", nTaxa = n_taxa, names = names)
+
+tree_height := treeHeight(tau)
+
+tau.setValue(t[1])
+

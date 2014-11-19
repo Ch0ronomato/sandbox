@@ -1,0 +1,2 @@
+Iteration	Posterior	Likelihood	Prior	phylogeny
+0	-17652.4	-17595.3	-57.0521	((Fagus_lucida2:0.815266,Fagus_lucida1:0.099667):3.277792,(Fagus_mexicana:0.191610,Fagus_orientalis:0.193657):1.923367,(((Fagus_japonica2:6.834637,(Fagus_sylvatica:0.515836,((Fagus_japonica1:0.113533,Fagus_longipetiolata:0.137367):1.205361,Fagus_crenata1:1.546353):2.298805):0.182607):1.070184,(Fagus_crenata2:4.664186,(Trig_excelsa:1.247795,Fagus_grandifolia:0.635349):0.406046):0.335702):0.138867,Fagus_engleriana:0.471615):0.411018):0.000000

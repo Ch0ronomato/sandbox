@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="lib/help.xsl" type="text/xsl"?>
+
+<revbayes-help
+	xmlns="http://www.revbayes.org/schema/help-entry"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.revbayes.org/schema/help-entry lib/rb-help-entry.xsd"
+>
+    <function-help-entry>
+    
+        <name>exp</name>
+
+        <title>Natural exponential function</title>
+    
+        <description>
+            <p>
+            Exponential function to the base e (Euler's number)
+            </p>
+        </description>
+
+        <usage>
+            <![CDATA[
+             exp( Real x )
+             ]]> 
+        </usage>
+    
+        <argument>
+            <label>x</label>
+            <argumentPassingMethod>by-const-reference</argumentPassingMethod>
+            <argumentNodeType>any-DAG-node</argumentNodeType>
+            <description>Exponent of the natural exponential function.</description>
+            <valueType>Real</valueType>
+        </argument>
+
+        <returnValue>RealPos, Real, RevObject</returnValue>
+
+        <details>
+            <p>
+            This function calculates the result of e to the power of x.
+            </p>
+        </details>
+
+        <example>
+            <![CDATA[
+		exp(1.0)
+		exp(0.0)
+		exp(1000.0)
+		exp(0.01)
+             ]]>
+
+        </example>
+
+        <author>Seraina Klopfstein</author>
+
+        <seeAlso>
+            <entry>dnExponential()</entry>
+            <entry>ln()</entry>
+        </seeAlso>
+
+
+    </function-help-entry>
+
+</revbayes-help>
+

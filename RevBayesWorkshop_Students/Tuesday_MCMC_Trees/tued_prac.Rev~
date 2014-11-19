@@ -1,0 +1,3 @@
+data_ITS <- readDiscreteCharacterData("fagus_ITS.nex")
+data_rbcL <- readDiscreteCharacterData("fagus_rbcL.nex")
+data_matK <- readDiscreteCharacterData("fagus_matK.nex")

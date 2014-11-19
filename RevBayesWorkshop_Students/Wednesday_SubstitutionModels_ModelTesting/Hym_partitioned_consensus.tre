@@ -1,0 +1,30 @@
+#NEXUS
+
+	Begin taxa;
+	Dimensions ntax=19;
+	Taxlabels
+		Apoidea
+		Blasticotoma
+		Cephus
+		Cladius
+		Coleoptera
+		Corynis
+		Diprion
+		Ichneumonidae
+		Lepidoptera
+		Lophyrotoma
+		Megalodontes
+		Orussus
+		Pamphilius
+		Sirex
+		Stephanidae
+		Syntexis
+		Tenthredo
+		Xiphydria
+		Xyela
+		;
+End;
+
+Begin trees;
+tree TREE1 = [&R](Blasticotoma:0.134773,Xyela:0.160003,(Coleoptera:0.160497,Lepidoptera:0.205067)[&posterior=0.555556]:0.017144,(Pamphilius:0.121660,(Xiphydria:0.152280,Apoidea:0.152280,Ichneumonidae:0.194647,(Cephus:0.141340,Megalodontes:0.159720)[&posterior=1.000000]:0.015668,(Corynis:0.125922,Tenthredo:0.144254,Lophyrotoma:0.141340,Cladius:0.174994,Diprion:0.132440)[&posterior=0.666667]:0.027907,(Orussus:0.208938,Stephanidae:0.174994,(Syntexis:0.162306,Sirex:0.213410)[&posterior=1.000000]:0.023883)[&posterior=0.555556]:0.028642)[&posterior=0.555556]:0.026146)[&posterior=0.555556]:0.022676)[&posterior=1.000000]:0.000000;
+End;

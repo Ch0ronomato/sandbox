@@ -1,0 +1,95 @@
+system("ls")
+source("tued_prac.Rev")
+dat
+data
+source("tued_prac.Rev")
+data
+str(data)
+source("tued_prac.Rev")
+names
+source("tued_prac.Rev")
+mi
+type(mi)
+uno <- 3
+type(uno)
+uno + 3
+mi + 8
+clear()
+source("tued_prac.Rev")
+mi
+moves
+?fnGTR
+source("tued_prac.Rev")
+Q
+Q.size()
+Q[1].size()
+Q[1]
+Q[1][1]
+Q[1,1]
+type(Q)
+str(Q)
+source("tued_prac.Rev")
+norm_gamma_rates
+str(norm_gamma_rates)
+norm_gamma_rates.size()
+source("tued_prac.Rev")
+moves
+source("tued_prac.Rev")
+moves
+moves[3]
+moves[1]
+moves[2]
+moves
+source("tued_prac.Rev")
+topology.methods()
+topology.redraw()
+topology
+topology.redraw()
+topology
+?dnBDP
+dnBDP
+dnBDP(names = names, org = 1, labmda = 1, mu = 0, nTaxa = n_speces)
+dnBDP(names = names, org = 1, labmda = 1, mu = 0, nTaxa = n_species)
+dnBDP(names = names, org = 1.0, labmda = 1.0, mu = 0.0, nTaxa = n_species)
+names
+t ~ dnBDP(names = names, org = 1.0, labmda = 1.0, mu = 0.0, nTaxa = n_species)
+t
+t ~ dnBDP(labmda = 1.0, mu = 0.0, nTaxa = n_species)
+source("tued_prac.Rev")
+n_branches
+topology
+source("tued_prac.Rev")
+TL
+str(TL)
+moves
+source("tued_prac.Rev")
+phylogeny
+topology
+str(phylogeny)
+str(topology)
+source("tued_prac.Rev")
+phyloSeq
+str(phyloSeq)
+source("tued_prac.Rev")
+moves
+source("tued_prac.Rev")
+treetrace
+treetrace.summarize()
+source("tued_prac.Rev")
+mymcmc.operatorSummary()
+moves.summary()
+moves.methods()
+moves
+moves[4]
+moves[3]
+moves[3].methods()
+mvNNI
+trbd ~ dnBDP()
+trbd ~ dnBDP(lambda = 0.0, mu = 1.0, origin = 50.0, rootAge = 50.0, rho = 1, names = names)
+trbd ~ dnBDP(lambda = 0.0, mu = 1.0, origin = 50.0, rootAge = 50.0, rho = 1, nTaxa = names)
+dnBDP
+trbd ~ dnBDP(lambda = 0.0, mu = 1.0, origin = 50.0, rho = 1, nTaxa = names)
+source("tued_prac.Rev")
+mymcmc.operatorSummary()
+source("tued_prac.Rev")
+q()

@@ -1,0 +1,83 @@
+clear()
+
+#Make stochastic mode
+x ~ dnNorm(0.0, 1.0)
+
+# save stochastic node into a variable to use as a model
+myModel = model(x)
+
+# Save moves
+moves[1] = mvSlide(x)
+
+# save screen and log file monitors
+monitors[1] = mnScreen(x)
+monitors[2] = mnFile(x, filename = "output_1.txt")
+
+#myMcmc = mcmc(myModel, monitors, moves)
+#myMcmc.run(100)
+
+# 2.8 Deterministic nodes
+clear()
+a <- 1
+b <- exp(a)
+
+c := exp(a)
+
+clear()
+prec ~ dnGamma(1.0E-3, 1.0E-3)
+mean ~ dnNorm(0.0, 0.5)
+
+sd := sqrt(1.0 / prec)
+x ~ dnNorm(mean, sd)
+
+model2 = model(x)
+moves2[1] = mvSlide(x)
+
+monit[1] = mnScreen(x)
+monit[2] = mnFile(x, filename = "output_2.txt")
+
+#myMcmc_2 = mcmc(model2, monit, moves2)
+#myMcmc_2.run(10000)
+
+
+##########
+# Normal dist examples
+##########
+
+clear()
+
+# Prior for the mean
+a <- 0.0
+b <- 20
+mu ~ dnUnif(a, b)
+
+moves[1] = mvSlide(mu, weight=1.0,delta=1.0)
+
+# Prior for the exponential
+c <- 1.0
+sigma ~ dnExponential(c)
+
+moves[2] = mvScale(sigma, weight=1.0, lambda=1.0, tune=false)
+
+monitors[1] = mnFile(filename="normaltest.out",printgen=1, separator = "	", mu, sigma)
+monitors[2] = mnScreen(printgen=100, mu, sigma)
+
+#observations <- [1.0180587, 0.3551789, -3.0993260, 2.0436601, 0.5752029, -2.2873659, -0.4357313, -2.1162503, -2.0887467, 0.5446856]
+
+observations <- rnorm(10, 15, 3)
+# Clamp priors
+for(i in 1:observations.size()){
+      x[i] ~ dnNorm(mu, sigma)
+      x[i].clamp(observations[i])
+}
+
+mymodel = model(a)
+
+mymcmc = mcmc(mymodel, monitors, moves)
+
+mymcmc.run(generations=10000)
+
+# now check how the operators have done
+mymcmc.operatorSummary()
+
+readTrace("normaltest.out")

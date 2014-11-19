@@ -1,0 +1,93 @@
+############################################################################################
+#   Tutorial for infering a non-clock tree of Hymenopteran taxa
+#   under a partitioned model, each partition evolving under GTR + G + I
+############################################################################################
+
+# here paste the block that reads in the data into separate partitions!
+data_16S <- readDiscreteCharacterData("data_16S.nex")
+data_28S <- readDiscreteCharacterData("data_28S.nex")
+data_COI <- readDiscreteCharacterData("data_CO1.nex")
+data_EF <- readDiscreteCharacterData("data_EF1a.nex")
+
+data <- data_16S + data_28S + data_COI + data_EF
+n_species <- data.ntaxa()
+tip_names <- data.names()
+
+mi <- 1
+# here paste the block that sets up a partition substitution model!
+# (you can also put that model partition into a separate file and just call it here
+# using source("substitutionFile.Rev") or similar.)
+
+
+
+
+##################################################################################
+# Tree model: uniform topology prior, exponential distribution on branch lengths #
+##################################################################################
+
+# Specify a uniform topology prior
+topology ~ dnUniformTopology(n_species, tip_names)
+
+# moves on the tree
+moves[mi++] = mvNNI(topology, weight=10.0)
+moves[mi++] = mvSPR(topology, weight=10.0)
+
+# prior and moves on the branch lengths #
+n_branches = n_species * 2 - 3
+
+for (i in 1:n_branches) {
+  # We use here the exponential distribution with rate 10.0 as the branch length prior
+  br_lens[i] ~ dnExponential(10.0)
+  
+  # Add a move for the branch length. We just take a simple scaling move since the value is a positive real number.
+  moves[mi++] = mvScale(br_lens[i], lambda=1, tune=true, weight=1.0) 
+}
+
+# create a deterministic variable for monitoring purposes
+TreeLength := sum(br_lens)
+
+# Build the tree by combining the topology with the branch length.
+phylogeny := treeAssembly(topology, br_lens)
+
+#######################################
+# PhyloCTMC Models for each partition #
+#######################################
+
+# fill in the right parameters for the dnPhyloCTMC function and the clamp function on the resulting object!
+
+for (i in 1:n_parts){
+  phyloSeq[i] ~ dnPhyloCTMC(tree=    , Q=    , branchRates=    , siteRates=    , pInv=    , ntype="DNA")
+  phyloSeq[i].clamp(    )
+}
+
+
+#############
+# THE Model #
+#############
+
+mymodel = model(topology)
+
+##########################
+# Customizing the Output #
+##########################
+parFileName = "Hym_partitioned.log"
+treeFileName = "Hym_partitioned.trees"
+
+monitor[1] = mnModel(filename=parFileName,printgen=1000, separator = " ")		
+monitor[2] = mnFile(filename=treeFileName,printgen=1000, separator = " ", phylogeny)	
+
+#########################
+# MCMC settings and run #
+#########################
+
+#mymcmc = mcmc(mymodel, monitor, moves, moveschedule="single")
+#mymcmc.run(generations=100000)				
+
+####################
+# some summarizing #
+####################
+pt = readTrace(parFileName, delimiter=" ")
+pt
+
+tt = readTreeTrace(treeFileName, "non-clock", " ")
+consensusTree(tt, "Hym_partitioned_consensus.tre", 0.5)
