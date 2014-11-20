@@ -90,10 +90,6 @@ phylogeny := treeAssembly(topology, br_lens)
 #}
 
 
-
-
-
-
 #######################################
 # PhyloCTMC Models for each partition #
 #######################################
@@ -111,6 +107,7 @@ for (i in 1:n_parts){
 #############
 
 mymodel = model(topology)
+
 
 ##########################
 # Customizing the Output #

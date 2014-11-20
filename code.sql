@@ -19,11 +19,11 @@ CREATE TABLE pet (
        dob DATETIME
 );
 
-INSERT INTO pet VALUES (0, 'fluffy', 'Unico', 0, 0, 13-13-2010);
-INSERT INTO pet VALUES (1, 'transist', 'robot', 1, 0, 13-13-2010);
-INSERT INTO pet VALUES (2, 'MAR', 'DOG', 12, 0, 13-13-2010);
-INSERT INTO pet VALUES (3, 'fins', 'fish', 14, 0, 13-13-2010);
-INSERT INTO pet VALUES (4, 'bert', 'cat', 1, 4, 13-13-2010);
+INSERT INTO pet VALUES (0, 'fluffy', 'Unico', 0, 0, '20101010');
+INSERT INTO pet VALUES (1, 'transist', 'robot', 1, 0, '20100101');
+INSERT INTO pet VALUES (2, 'MAR', 'DOG', 12, 0, '20100202');
+INSERT INTO pet VALUES (3, 'fins', 'fish', 14, 0, '20100707');
+INSERT INTO pet VALUES (4, 'bert', 'cat', 1, 4, '20100303');
 
 CREATE TABLE person_pet (
       person_id INTEGER,
