@@ -33,7 +33,7 @@ birth_rate := diversification / abs(1.0 - turnover)
 
 death_rate :=  (turnover * diversification) / abs(1.0 - turnover)
 
-rho <- 10 / 147
+rho <- 10.0 / 147.0
 
 #> t ~dnBDP(lambda = 1, mu = 0, origin  = 1, nTaxa = 4, names = ["a", "b", "c", "d"])
 mean <- 49 - 38
@@ -48,6 +48,7 @@ root_time ~ dnLnorm(mean = MU, sd = sigma, offset = 38.0)
 # two internal calibrations will be used
 # first we have to create constraints on which we will condition the birth-death process tree topology
 # create a constraint using the clade function for the bear family Ursidae
+
 clade_Ursidae <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_malayanus","Ursus_americanus","Ursus_thibetanus","Ursus_arctos","Ursus_maritimus","Melursus_ursinus")
 
 # create a constraint for Ursidae + Pinnipedia (Phoca largha)
@@ -56,7 +57,7 @@ clade_UrsPinn <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_
 constraints <- v(clade_Ursidae, clade_UrsPinn)
 
 # the time tree is a stochastic node modeled by the constant rate birth-death process (dnBDP)
-timetree ~ dnBDP(lambda = birth_rate, mu = death_rate, origin = root_time, nTaxa = n_taxa, names = names, rho = 0.05)
+timetree ~ dnBDP(lambda = birth_rate, mu = death_rate, origin = root_time, nTaxa = n_taxa, names = names, rho = 0.068, constraints = constraints)
 
 #timetree ~ dnBDP(lambda=birth_rate, mu=death_rate, rho=rho, origin=root_time, samplingStrategy="uniform", condition="nTaxa", nTaxa=n_taxa, names=names,constraints=constraints)
 
@@ -109,7 +110,7 @@ stem_Ursid_fossil.clamp(tParictis)
 ############ UCLN model on branch rates ###########
 ###################################################
 
-# THERE IS A PROBLEM WITH NON-IDENTIFIABILIY IN THEIS TUTORIAL
+# THERE IS A PROBLEM WITH NON-IDENTIFIABILIY IN THIS TUTORIAL
 
 ### the variable for the base rate (i.e., the overall clockrate on the tree)
 ### with a gamma distribution wiht rate of 1 and shape parameter with and exponential hyperprior
@@ -120,6 +121,7 @@ stem_Ursid_fossil.clamp(tParictis)
 s_gam ~ dnExp(0.5)
 moves[mi++] = mvScale(s_gam, lambda = 0.25, tune = true, weight = 1)
 base_rate ~ dnGamma(shape = s_gam, rate = 1)
+#base_rate <- 1
 moves[mi++] = mvScale(base_rate,lambda=0.25,tune=true,weight=5.0)
 
 ### get the number of branches in the tree
@@ -157,40 +159,40 @@ moves[mi++] = mvVectorSingleElementScale(branch_rates,lambda=30.0,tune=true,weig
 branch_subrates := branch_rates * base_rate
 
 ### a helpful parameter to monitor
-#mean_rt := mean(branch_rates) 
+mean_rt := mean(branch_rates) 
 
 ########################################
 ###### GTR model of seq evolution  #####
 ########################################
 
-#pi ~ dnDirichlet(v(1,1,1,1))
-#moves[mi++] = mvSimplexElementScale(pi, alpha=10.0, tune=true, weight=3.0)
-#er ~ dnDirichlet(v(1,1,1,1,1,1))
-#moves[mi++] = mvSimplexElementScale(er, alpha=10.0, tune=true, weight=3.0)
-#Q := fnGTR(er,pi)
+pi ~ dnDirichlet(v(1,1,1,1))
+moves[mi++] = mvSimplexElementScale(pi, alpha=10.0, tune=true, weight=3.0)
+er ~ dnDirichlet(v(1,1,1,1,1,1))
+moves[mi++] = mvSimplexElementScale(er, alpha=10.0, tune=true, weight=3.0)
+Q := fnGTR(er,pi)
 
 
 ############################################################################################
 ### the full phylogenetic CTMC
 ############################################################################################
 
-#phySeq ~ dnPhyloCTMC(tree=timetree, Q=Q, branchRates=branch_subrates, nSites=n_sites, type="DNA")
+phySeq ~ dnPhyloCTMC(tree=timetree, Q=Q, branchRates=branch_subrates, nSites=n_sites, type="DNA")
 
 ### attach the observed sequence data
-#phySeq.clamp(D)
+phySeq.clamp(D)
 
 ### workspace model wrapper ###
-#mymodel = model(er)
+mymodel = model(er)
 
 ### Monitors and MCMC
-#monitors[1] = mnModel(filename="bears.log",printgen=10, separator = "	")	
-#monitors[2] = mnFile(filename="bears.trees",printgen=10, separator = "	", timetree)	
-#monitors[3] = mnScreen(printgen=10, mean_rt, birth_rate, death_rate, root_time)								
+monitors[1] = mnModel(filename="bears.log",printgen=10, separator = "	")	
+monitors[2] = mnFile(filename="bears.trees",printgen=10, separator = "	", timetree)	
+monitors[3] = mnScreen(printgen=10, mean_rt, birth_rate, death_rate, root_time)								
 
-#mymcmc = mcmc(mymodel, monitors, moves)		# set up an MCMC object with the model, monitors and moves
-#mymcmc.run(generations=10000)				# and now run it... This runs a single independent run, without Metropolis-coupling
+mymcmc = mcmc(mymodel, monitors, moves)		# set up an MCMC object with the model, monitors and moves
+#mymcmc.run(generations=1000)				# and now run it... This runs a single independent run, without Metropolis-coupling
 
 # Now, we will analyze the tree output.
-#treetrace = readTreeTrace("bears.trees", treetype="clock") 	# we start by reading in the tree trace from the tree monitor file
+treetrace = readTreeTrace("bears.trees", treetype="clock") 	# we start by reading in the tree trace from the tree monitor file
 
-#consensusTree(treetrace,"bear_con.tree", 0.5)	# creating a MR consensus tree
+consensusTree(treetrace,"bear_con.tree", 0.5)	# creating a MR consensus tree

@@ -36,7 +36,10 @@ moves[mi++] = mvRandomIntegerWalk(index)
 
 Q := vals[ index  ]
 
+# can we test topologies by assigning an index variable to two trees?
+
 topology ~ dnUniformTopology(n_species, names)
+
 
 moves[ mi++ ] = mvNNI(topology, weight = 10.0)
 

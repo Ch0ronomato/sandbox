@@ -79,3 +79,14 @@ dnGamma
 dnGamma(1)
 dnGamma(1, 1)
 source("Bears_skeletal.Rev")
+q()
+source("Bears_skeletal.Rev")
+mymodel
+source("Bears_skeletal.Rev")
+mymodel
+source("Bears_skeletal.Rev")
+constratits
+constraints
+timetree
+str(timetree)
+q()

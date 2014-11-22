@@ -1,3 +1,4 @@
+clear()
 ############################################################################################
 #   File: timetree tutorial model specification and for estimating divergence times
 #		  under the UCLN model on a fixed tree
@@ -22,18 +23,24 @@ T = readTrees("bears_dosReis.tre")[1]
 n_taxa = T.ntips()
 names = T.names()
 
-# birth-death process model 
+diversification ~ dnExponential(0.1)
+moves[mi++] = mvScale(diversification, lambda = 1, tune = true, weight = 1)
 
-#
-# add exercise 1.a here!
-#
-#
+turnover ~ dnBeta(1.0, 1.0)
+moves[mi++] = mvSlide(turnover, tune = true, weight = 1)
 
+birth_rate := diversification / abs(1.0 - turnover)
 
-#
-# add exercise 1.b here!
-#
-#
+death_rate :=  (turnover * diversification) / abs(1.0 - turnover)
+
+rho <- 10.0 / 147.0
+
+#> t ~dnBDP(lambda = 1, mu = 0, origin  = 1, nTaxa = 4, names = ["a", "b", "c", "d"])
+mean <- 49 - 38
+sigma <- 0.25
+MU <- ln(mean) - ((sigma * sigma) * 0.5)
+root_time ~ dnLnorm(mean = MU, sd = sigma, offset = 38.0)
+
 
 
 ###### Calibration point setup ####
@@ -41,17 +48,18 @@ names = T.names()
 # two internal calibrations will be used
 # first we have to create constraints on which we will condition the birth-death process tree topology
 # create a constraint using the clade function for the bear family Ursidae
-clade_Ursidae <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_malayanus",
-						"Ursus_americanus","Ursus_thibetanus","Ursus_arctos","Ursus_maritimus","Melursus_ursinus")
+
+clade_Ursidae <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_malayanus","Ursus_americanus","Ursus_thibetanus","Ursus_arctos","Ursus_maritimus","Melursus_ursinus")
+
 # create a constraint for Ursidae + Pinnipedia (Phoca largha)
-clade_UrsPinn <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_malayanus",
-						"Ursus_americanus","Ursus_thibetanus","Ursus_arctos","Ursus_maritimus","Melursus_ursinus",
-						"Phoca_largha")
+clade_UrsPinn <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_malayanus","Ursus_americanus","Ursus_thibetanus","Ursus_arctos","Ursus_maritimus","Melursus_ursinus","Phoca_largha")
 # load the constraints into a vector for the BDP model
 constraints <- v(clade_Ursidae, clade_UrsPinn)
 
 # the time tree is a stochastic node modeled by the constant rate birth-death process (dnBDP)
-timetree ~ dnBDP(lambda=birth_rate, mu=death_rate, rho=rho, rootAge=root_time, samplingStrategy="uniform", condition="nTaxa", nTaxa=n_taxa, names=names,constraints=constraints)
+timetree ~ dnBDP(lambda = birth_rate, mu = death_rate, origin = root_time, nTaxa = n_taxa, names = names, rho = 0.068, constraints = constraints)
+
+#timetree ~ dnBDP(lambda=birth_rate, mu=death_rate, rho=rho, origin=root_time, samplingStrategy="uniform", condition="nTaxa", nTaxa=n_taxa, names=names,constraints=constraints)
 
 # set the initial value of the time tree to the dos Reis et al. (2013) tree
 # this is needed because the starting value must be consistent with our internal node constraints
@@ -67,7 +75,7 @@ moves[mi++] = mvTreeScale(tree=timetree, rootAge=root_time, delta=1.0, tune=true
 ####### Internal node constraints #######
 
 # first create a deterministic node for the age of the MRCA of all Ursidae
-tmrca_Ursidae := tmrca(timetree,clade_Ursidae)
+tmrca_Ursidae := tmrca(timetree, clade_Ursidae)
 
 # create an additional deterministic node that is negative, representing time in the past
 n_TMRCA_Ursidae := -(tmrca_Ursidae)
@@ -102,13 +110,18 @@ stem_Ursid_fossil.clamp(tParictis)
 ############ UCLN model on branch rates ###########
 ###################################################
 
-### the variable for the base rate (i.e., the overall clockrate on the tree)
-### with a lognormal prior and a scale move
+# THERE IS A PROBLEM WITH NON-IDENTIFIABILIY IN THIS TUTORIAL
 
-br_M <- 5.4E-3
-br_s <- 0.05
-br_mu <- ln(br_M) - ((br_s * br_s) * 0.5) #this is the mean of the lognormal distribution, calculated from the mean M on the corresponding normal and the stdev (see Wikipedia)
-base_rate ~ dnLnorm(br_mu, br_s)
+### the variable for the base rate (i.e., the overall clockrate on the tree)
+### with a gamma distribution wiht rate of 1 and shape parameter with and exponential hyperprior
+
+#br_M <- 5.4E-3
+#br_s <- 0.05
+#br_mu <- ln(br_M) - ((br_s * br_s) * 0.5) #this is the mean of the lognormal distribution, calculated from the mean M on the corresponding normal and the stdev (see Wikipedia)
+s_gam ~ dnExp(0.5)
+moves[mi++] = mvScale(s_gam, lambda = 0.25, tune = true, weight = 1)
+base_rate ~ dnGamma(shape = s_gam, rate = 1)
+#base_rate <- 1
 moves[mi++] = mvScale(base_rate,lambda=0.25,tune=true,weight=5.0)
 
 ### get the number of branches in the tree
@@ -177,7 +190,7 @@ monitors[2] = mnFile(filename="bears.trees",printgen=10, separator = "	", timetr
 monitors[3] = mnScreen(printgen=10, mean_rt, birth_rate, death_rate, root_time)								
 
 mymcmc = mcmc(mymodel, monitors, moves)		# set up an MCMC object with the model, monitors and moves
-mymcmc.run(generations=10000)				# and now run it... This runs a single independent run, without Metropolis-coupling
+#mymcmc.run(generations=1000)				# and now run it... This runs a single independent run, without Metropolis-coupling
 
 # Now, we will analyze the tree output.
 treetrace = readTreeTrace("bears.trees", treetype="clock") 	# we start by reading in the tree trace from the tree monitor file

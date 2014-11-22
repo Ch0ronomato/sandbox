@@ -1,9 +1,3 @@
-str(br_lens[1])
-source("wed.Rev")
-Q_gtr
-norm_gamma_rates
- data.size()
-data[1]
 data[2]
 data[3]
 source("wed.Rev")
@@ -96,5 +90,11 @@ br_lens_part_2
 br_lens_part_3
 br_lens_part_5
 data
-source("wedpow.Rev")
+source("ps_estimate_wed.Rev")
+phylogeny_2
+monitors
+monitor
+monitor[4]
+str(monitor[4])
+source("ps_estimate_wed.Rev")
 q()

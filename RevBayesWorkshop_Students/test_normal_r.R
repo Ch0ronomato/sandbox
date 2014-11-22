@@ -5,6 +5,12 @@ likelihood <- function(params){
      return(sum(log10(dnorm(data_obs, params[1], params[2]))))
 }
 
+likelihood_2 <- function(params){
+     return(sum(log10(dexp(data_obs, params[1]))))
+}
+
+
+
 prior <- function(params){
       mu_prior <- dnorm(params[1], 0, 100)
       sd_prior <- dexp(params[2])

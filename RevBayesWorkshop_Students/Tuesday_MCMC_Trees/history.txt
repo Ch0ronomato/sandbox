@@ -1,21 +1,3 @@
-system("ls")
-source("tued_prac.Rev")
-dat
-data
-source("tued_prac.Rev")
-data
-str(data)
-source("tued_prac.Rev")
-names
-source("tued_prac.Rev")
-mi
-type(mi)
-uno <- 3
-type(uno)
-uno + 3
-mi + 8
-clear()
-source("tued_prac.Rev")
 mi
 moves
 ?fnGTR
@@ -91,5 +73,28 @@ dnBDP
 trbd ~ dnBDP(lambda = 0.0, mu = 1.0, origin = 50.0, rho = 1, nTaxa = names)
 source("tued_prac.Rev")
 mymcmc.operatorSummary()
+source("tued_prac.Rev")
+q()
+source("tued_prac.Rev")
+dnDirichlet(v(1, 1, 1, 1))
+dnDirichlet(v(1, 1, 1, 1), alpha = 0.5)
+dnDirichlet(alpha = 0.5)
+dnDirichlet
+dnDirichlet(v(1, 1), alpha = 5.0)
+dnDirichlet(v(1.0, 1.0), alpha = 5.0)
+dnDirichlet(v(1, 1, 1, 1))
+wow = dnDirichlet(v(1, 1, 1, 1))
+wow
+wow ~ dnDirichlet(v(1, 1, 1, 1))
+wow
+wow.redraw()
+wow.redraw
+()
+wow.methods()
+wow
+wow.sort()
+wow.sort
+()
+sum(wow)
 source("tued_prac.Rev")
 q()

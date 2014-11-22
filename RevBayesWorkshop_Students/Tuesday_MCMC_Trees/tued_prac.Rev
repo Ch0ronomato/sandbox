@@ -19,15 +19,21 @@ pi_prior <- v(1, 1, 1, 1)
 pi ~ dnDirichlet(pi_prior)
 moves[mi++] = mvSimplexElementScale(pi, alpha = 0.1, tune = false, weight = 1.0)
 
-
-
 Q := fnGTR(er, pi)
 
 alpha_prior_min <- 0.1
 alpha_prior_max <- 50.0
 alpha ~ dnUnif(alpha_prior_min, alpha_prior_max)
 
-norm_gamma_rates := fnDiscretizeGamma(alpha, alpha, 4, false)
+# Draw the category rates from arbitrary distribution with flexible categories
+##########
+#rateprops ~ dnDirichlet( v(1,1,1,1) )
+
+
+#category_rates ~ dnOrderStat( dnDirichlet( v(1,1,1,1) ) )
+############
+
+norm_gamma_rates := fnDiscretizeGamma(alpha, alpha, 1, false)
 
 moves[mi++] = mvScale(alpha, lambda = 10.0, tune = false, weight = 1.0)
 
@@ -62,7 +68,7 @@ monitor[2] = mnFile(filename = "mcmc_posterior_run1.trees", printgen = 10, separ
 monitor[3] = mnScreen(printgen = 10, alpha, TL, pinvar)
 
 mymcmc = mcmc(mymodel, monitor, moves, moveschedule = "single")
-mymcmc.run(generations = 100000)
+mymcmc.run(generations = 10000)
 
 treetrace = readTreeTrace("mcmc_posterior_run1.trees", "non-clock", " ")
 treetrace.summarize()

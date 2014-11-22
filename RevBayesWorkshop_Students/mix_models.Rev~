@@ -24,13 +24,17 @@ moves[mi++] = mvSimplexElementScale(sf, alpha = 10.0, tune = true, weight = 2.0)
 Q_GTR := fnGTR(er, sf)
 vals := v(Q_JC, Q_GTR)
 
-index ~ dnBernoulli(0.5)
+function get_ind(  ) {
+ rbernoulli(p = 0.5)[1] + 1
+}
+
+index ~ dnBernoulli(p = 0.5)
 index.setValue(1)
+moves[mi++] = mvRandomIntegerWalk(index)
 
+#next_i := index + 1
 
-#moves[mi++] = mvMixtureAllocation(index)
-
-Q := vals[ index + 1 ]
+Q := vals[ index  ]
 
 topology ~ dnUniformTopology(n_species, names)
 
@@ -45,7 +49,7 @@ TL := mean(br_lens) * n_branches
 
 phylogeny := treeAssembly(topology, br_lens)
 
-phyloSeq ~ dnPhyloCTMC(tree = phylogeny, Q = Q_JC, nSites = n_sites, type = "DNA")
+phyloSeq ~ dnPhyloCTMC(tree = phylogeny, Q = Q, nSites = n_sites, type = "DNA")
 
 phyloSeq.clamp(data)
 
