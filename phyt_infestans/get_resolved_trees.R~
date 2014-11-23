@@ -1,0 +1,6 @@
+
+for(i in dir('functions')){
+      print(paste('load', i))
+  source(paste0('functions/', i))
+}
+
