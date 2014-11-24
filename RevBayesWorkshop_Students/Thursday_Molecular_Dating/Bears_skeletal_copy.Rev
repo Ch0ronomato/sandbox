@@ -1,0 +1,214 @@
+clear()
+############################################################################################
+#   File: timetree tutorial model specification and for estimating divergence times
+#		  under the UCLN model on a fixed tree
+############################################################################################
+
+# Load the sequence alignment
+D <- readDiscreteCharacterData(file="bears_irbp.nex")
+
+# get helpful variables from the data
+n_sites = D.nchar(1)
+
+# initialize an iterator for the moves vector
+mi = 0
+
+################################################
+# set up the birth-death model (on fixed tree) #
+################################################
+# read in the tree 
+T = readTrees("bears_dosReis.tre")[1]
+
+# get helpful variables from the tree
+n_taxa = T.ntips()
+names = T.names()
+
+diversification ~ dnExponential(0.1)
+moves[mi++] = mvScale(diversification, lambda = 1, tune = true, weight = 1)
+
+turnover ~ dnBeta(1.0, 1.0)
+moves[mi++] = mvSlide(turnover, tune = true, weight = 1)
+
+birth_rate := diversification / abs(1.0 - turnover)
+
+death_rate :=  (turnover * diversification) / abs(1.0 - turnover)
+
+rho <- 10.0 / 147.0
+
+#> t ~dnBDP(lambda = 1, mu = 0, origin  = 1, nTaxa = 4, names = ["a", "b", "c", "d"])
+mean <- 49 - 38
+sigma <- 0.25
+MU <- ln(mean) - ((sigma * sigma) * 0.5)
+root_time_1 ~ dnLnorm(mean = MU, sd = sigma, offset = 38.0)
+root_time_2 ~ dnLnorm(mean = MU, sd = sigma, offset = 38.0)
+
+
+
+###### Calibration point setup ####
+
+# two internal calibrations will be used
+# first we have to create constraints on which we will condition the birth-death process tree topology
+# create a constraint using the clade function for the bear family Ursidae
+
+#clade_Ursidae <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_malayanus","Ursus_americanus","Ursus_thibetanus","Ursus_arctos","Ursus_maritimus","Melursus_ursinus")
+
+# create a constraint for Ursidae + Pinnipedia (Phoca largha)
+#clade_UrsPinn <- clade("Ailuropoda_melanoleuca","Tremarctos_ornatus","Helarctos_malayanus","Ursus_americanus","Ursus_thibetanus","Ursus_arctos","Ursus_maritimus","Melursus_ursinus","Phoca_largha")
+# load the constraints into a vector for the BDP model
+#constraints <- v(clade_Ursidae, clade_UrsPinn)
+
+# the time tree is a stochastic node modeled by the constant rate birth-death process (dnBDP)
+timetree_1 ~ dnBDP(lambda = birth_rate, mu = death_rate, origin = root_time_1, nTaxa = n_taxa, names = names, rho = 0.068)
+#timetree_1.setValue(T)
+moves[mi++] = mvNodeTimeSlideUniform(timetree_1, weight=30.0)
+moves[mi++] = mvSlide(root_time_1, delta=2.0, tune=true, weight=10.0)
+moves[mi++] = mvScale(root_time_1, lambda=2.0, tune=true, weight=10.0)
+moves[mi++] = mvTreeScale(tree=timetree_1, rootAge=root_time_1, delta=1.0, tune=true, weight=3.0)
+
+
+
+
+#timetree_2 ~ dnBDP(lambda = birth_rate, mu = death_rate, origin = root_time_2, nTaxa = n_taxa, names = names, rho = 0.068)
+timetree_2 ~ dnUniformTimeTree(root_time_2, taxonNames = names)
+#timetree_2.setValue(T)
+moves[mi++] = mvNodeTimeSlideUniform(timetree_2, weight=30.0)
+moves[mi++] = mvSlide(root_time_2, delta=2.0, tune=true, weight=10.0)
+moves[mi++] = mvScale(root_time_2, lambda=2.0, tune=true, weight=10.0)
+moves[mi++] = mvTreeScale(tree=timetree_2, rootAge=root_time_2, delta=1.0, tune=true, weight=3.0)
+
+
+vals := v(timetree_1, timetree_2)
+
+index ~ dnCat(simplex(1, 1))
+#index.setValue(1)
+moves[mi++] = mvRandomIntegerWalk(index, weight = 30.0)
+
+timetree := vals[index]
+
+# set the initial value of the time tree to the dos Reis et al. (2013) tree
+# this is needed because the starting value must be consistent with our internal node constraints
+#timetree.setValue(T)
+
+### add moves on the tree node times, including the root time 
+
+
+####### Internal node constraints #######
+
+#tmrca_Ursidae := tmrca(timetree, clade_Ursidae)
+#n_TMRCA_Ursidae := -(tmrca_Ursidae)
+#tKretzoiarctos <- -11.2
+
+# the age of the fossil is a stochastic node that has a lognormal waiting time that is a function of the age of the calibration node
+# we will model this waiting time so that the fossil is 10 My younger than its ancestor
+#M <- 10
+#sdv <- 0.25
+#mu <- ln(M) - ((sdv * sdv) * 0.5)
+
+# using these parameters we create a stochastic node for the fossil 
+# Kretzoiarctos is a fossil panda, and thus a crown fossil
+#crown_Ursid_fossil ~ dnLnorm(mu, sdv, offset=n_TMRCA_Ursidae)
+# then we clamp this node with the observed fossil specimen, treating the fossil like data
+#crown_Ursid_fossil.clamp(tKretzoiarctos)
+
+# second calibration point: all ursids plus the gray seal
+#tmrca_UrsidaePinn := tmrca(timetree,clade_UrsPinn)
+#n_TMRCA_UrsidaePinn := -(tmrca_UrsidaePinn)
+#tParictis <- -33.9
+# the age of the fossil is a stochastic node that has an exponential waiting time that is a function of the age of the calibration node
+# we will model this waiting time so that the fossil is 30 My younger than its ancestor
+# Parictis is the earliest known genus of bears, in the family Ursidae
+# this fossil is a stem ursid fossil, and branched off the tree before the MRCA of living bears
+#stem_Ursid_fossil ~ dnExponential(lambda=0.0333, offset=n_TMRCA_UrsidaePinn)
+# then we clamp this node with the observed fossil specimen, treating the fossil like data
+#stem_Ursid_fossil.clamp(tParictis)
+
+###################################################
+############ UCLN model on branch rates ###########
+###################################################
+
+# THERE IS A PROBLEM WITH NON-IDENTIFIABILIY IN THIS TUTORIAL
+
+### the variable for the base rate (i.e., the overall clockrate on the tree)
+### with a gamma distribution wiht rate of 1 and shape parameter with and exponential hyperprior
+
+#br_M <- 5.4E-3
+#br_s <- 0.05
+#br_mu <- ln(br_M) - ((br_s * br_s) * 0.5) #this is the mean of the lognormal distribution, calculated from the mean M on the corresponding normal and the stdev (see Wikipedia)
+s_gam ~ dnExp(0.5)
+moves[mi++] = mvScale(s_gam, lambda = 0.25, tune = true, weight = 1)
+base_rate ~ dnGamma(shape = s_gam, rate = 1)
+#base_rate <- 1
+moves[mi++] = mvScale(base_rate,lambda=0.25,tune=true,weight=5.0)
+
+### get the number of branches in the tree
+n_branches <- 2 * n_taxa - 2
+
+### the rate along each branch is assigned a lognormal prior
+### the expectation of the lognormal is the ucln_mean, and will be given an exponential hyperprior
+ucln_mean ~ dnExponential(2.0)
+
+### we will also estimate the standard deviation of the lognormal (ucln_sigma) with an exponential hyperprior
+ucln_sigma ~ dnExponential(3.0)
+
+### we can create deterministic nodes for the variance and mu of the lognormal
+ucln_var := ucln_sigma * ucln_sigma
+ucln_mu := ln(ucln_mean) - (ucln_var * 0.5)
+
+### both the ucln_mean and ucln_sigma will be operated on by scale moves
+moves[mi++] = mvScale(ucln_mean, lambda=1.0, tune=true, weight=4.0)
+moves[mi++] = mvScale(ucln_sigma, lambda=0.5, tune=true, weight=4.0)
+
+### now we will create a vector of stochastic nodes 
+### each element in the vector represents a branch rate
+### the indices of the vector correspond to branch indices in the tree
+### using a for-lop initialize the branch rates and assign a move to each one
+for(i in 1:n_branches){
+	branch_rates[i] ~ dnLnorm(ucln_mu, ucln_sigma)
+	moves[mi++] = mvScale(branch_rates[i],lambda=1.0,tune=true,weight=2.0)
+}
+
+### add 2 more moves on the branch rate vector
+moves[mi++] = mvVectorScale(branch_rates,lambda=1.0,tune=true,weight=2.0) 
+moves[mi++] = mvVectorSingleElementScale(branch_rates,lambda=30.0,tune=true,weight=1.0) 
+
+### the branch-rates used in the phylogenetic CTMC are a function of the branch rates and the base rate
+branch_subrates := branch_rates * base_rate
+
+### a helpful parameter to monitor
+mean_rt := mean(branch_rates) 
+
+########################################
+###### GTR model of seq evolution  #####
+########################################
+
+pi ~ dnDirichlet(v(1,1,1,1))
+moves[mi++] = mvSimplexElementScale(pi, alpha=10.0, tune=true, weight=3.0)
+er ~ dnDirichlet(v(1,1,1,1,1,1))
+moves[mi++] = mvSimplexElementScale(er, alpha=10.0, tune=true, weight=3.0)
+Q := fnGTR(er,pi)
+
+
+############################################################################################
+### the full phylogenetic CTMC
+############################################################################################
+
+phySeq ~ dnPhyloCTMC(tree=timetree, Q=Q, branchRates=branch_subrates, nSites=n_sites, type="DNA")
+
+### attach the observed sequence data
+phySeq.clamp(D)
+
+### workspace model wrapper ###
+mymodel = model(er)
+
+### Monitors and MCMC
+monitors[1] = mnModel(filename="bears.log",printgen=10, separator = "	")	
+monitors[2] = mnFile(filename="bears.trees",printgen=10, separator = "	", timetree)	
+monitors[3] = mnScreen(printgen=10, mean_rt, root_time_1, root_time_2, index)								
+
+mymcmc = mcmc(mymodel, monitors, moves)		# set up an MCMC object with the model, monitors and moves
+mymcmc.run(generations=1000)				# and now run it... This runs a single independent run, without Metropolis-coupling
+
+# Now, we will analyze the tree output.
+#treetrace = readTreeTrace("bears.trees", treetype="clock") 	# we start by reading in the tree trace from the tree monitor file
+
+#consensusTree(treetrace,"bear_con.tree", 0.5)	# creating a MR consensus tree

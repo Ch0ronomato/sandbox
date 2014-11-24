@@ -1,29 +1,3 @@
-stop("para")
-q()
-source("Bears_skeletal.Rev")
-D
-D.nsites(1)
-D.nchar(1)
-dnBD
-dnBDP
-dnBDP(lambda = 1, mu = 0, origin  = 1)
-dnBDP(lambda = 1, mu = 0, origin  = 1, nTaxa = 30)
-dnBDP(lambda = 1, mu = 0, origin  = 1, nTaxa = 4, names = ["a", "b", "c", "d"])
-t ~dnBDP(lambda = 1, mu = 0, origin  = 1, nTaxa = 4, names = ["a", "b", "c", "d"])
-t
-mvScale
-dnBeta(1.0, 1.0)
-bet ~dnBeta(1.0, 1.0)
-bet
-source("Bears_skeletal.Rev")
-turnover
-mvSlide
-mvSlide(1.1)
-source("Bears_skeletal.Rev")
-moves
-source("Bears_skeletal.Rev")
-death_rate
-source("Bears_skeletal.Rev")
 rho
 dnLNo
 dnLnorm
@@ -90,3 +64,37 @@ constraints
 timetree
 str(timetree)
 q()
+source("Bears_skeletal_copy.Rev")
+timetree
+methods(timetree)
+timetree.setvalue()
+timetree.methods
+()
+timetree.methods()
+source("Bears_skeletal_copy.Rev")
+q()
+source("Bears_skeletal_copy.Rev")
+timetree\\
+timetree
+timetree.setValue(T)
+T
+time_tree[1].setValue(T)
+timetree[1].setValue(T)
+timetree[1]
+vals
+timetree
+timetree_1
+timetree_1.setValue(T)
+source("Bears_skeletal_copy.Rev")
+source("Bears_skeletal.Rev")
+source("Bears_skeletal_copy.Rev")
+dnCat(v(1, 1))
+dndCat(v(1, 1))
+q()
+dnCat(v(1, 1))
+dnCat(v(1.0, 1.0))
+dnCat(simplex(1, 1))
+source("Bears_skeletal_copy.Rev")
+dnUniformTimeTree
+source("Bears_skeletal_copy.Rev")
+source("/Users/sebastianducheneAIr/Downloads/revbayes-adelaide_workshop/projects/cmake/mix_models.Rev")
