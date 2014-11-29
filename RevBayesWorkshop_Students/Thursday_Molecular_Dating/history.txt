@@ -1,4 +1,3 @@
-rho
 dnLNo
 dnLnorm
 source("Bears_skeletal.Rev")
@@ -98,3 +97,4 @@ source("Bears_skeletal_copy.Rev")
 dnUniformTimeTree
 source("Bears_skeletal_copy.Rev")
 source("/Users/sebastianducheneAIr/Downloads/revbayes-adelaide_workshop/projects/cmake/mix_models.Rev")
+q()
