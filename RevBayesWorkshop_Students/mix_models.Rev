@@ -1,0 +1,74 @@
+clear()
+
+data_atp <- readDiscreteCharacterData("Tuesday_MCMC_Trees/fagus_ITS.nex")
+data_matK <- readDiscreteCharacterData("Tuesday_MCMC_Trees/fagus_matK.nex")
+data <- data_atp + data_matK
+
+n_species <- data.ntaxa()
+n_sites <- data.nchar(1)
+names <- data.names()
+n_branches <- 2 * n_species - 3
+
+mi <- 0
+
+Q_JC := fnJC(4)
+
+er_prior <- v(1, 1, 1, 1, 1, 1)
+er ~ dnDirichlet(er_prior)
+moves[mi++] = mvSimplexElementScale(er, alpha = 10.0, tune = true, weight = 3.0)
+
+sf_prior <- v(1, 1, 1, 1)
+sf ~ dnDirichlet(sf_prior)
+moves[mi++] = mvSimplexElementScale(sf, alpha = 10.0, tune = true, weight = 2.0)
+
+Q_GTR := fnGTR(er, sf)
+vals := v(Q_JC, Q_GTR)
+
+function get_ind(  ) {
+ rbernoulli(p = 0.5)[1] + 1
+}
+
+index ~ dnBernoulli(p = 0.5)
+index.setValue(1)
+moves[mi++] = mvRandomIntegerWalk(index)
+
+#next_i := index + 1
+
+Q := vals[ index  ]
+
+# can we test topologies by assigning an index variable to two trees?
+
+topology ~ dnUniformTopology(n_species, names)
+
+
+moves[ mi++ ] = mvNNI(topology, weight = 10.0)
+
+for (i in 1:n_branches){
+    br_lens[i] ~ dnExponential(1.0)
+    moves[mi++] = mvScale(br_lens[i], lambda = 1.0, tune = true, weight = 1.0)
+}
+
+TL := mean(br_lens) * n_branches
+
+phylogeny := treeAssembly(topology, br_lens)
+
+phyloSeq ~ dnPhyloCTMC(tree = phylogeny, Q = Q, nSites = n_sites, type = "DNA")
+
+phyloSeq.clamp(data)
+
+
+monitors[1] = mnModel(filename = "subs_mixture.log", printgen = 10, separator = "	")
+monitors[2] = mnFile(filename = "subs_mixture.trees", printgen = 10, separator = "	", phylogeny)
+monitors[3] = mnScreen(print = 10, TL, index)
+
+
+mymodel = model(phylogeny)
+
+
+mymcmc = mcmc(mymodel, monitors, moves)
+
+
+mymcmc.run(generations = 2000)
+
+
+

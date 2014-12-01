@@ -1,0 +1,140 @@
+############################################################################################
+#   Tutorial for infering a non-clock tree of Hymenopteran taxa
+#   under a partitioned model, each partition evolving under GTR + G + I
+############################################################################################
+clear()
+
+# here paste the block that reads in the data into separate partitions!
+data[1] <- readDiscreteCharacterData("data_16S.nex")
+data[2] <- readDiscreteCharacterData("data_28S.nex")
+data[3] <- readDiscreteCharacterData("data_EF1a.nex")
+data[3].setCodonPartition(v(1, 2)) 
+data[4] <- readDiscreteCharacterData("data_EF1a.nex")
+data[4].setCodonPartition(3)
+
+data[5] <- readDiscreteCharacterData("data_CO1.nex")
+data[5].setCodonPartition(v(1, 2))
+data[6] <- readDiscreteCharacterData("data_CO1.nex")
+data[6].setCodonPartition(3)
+
+
+n_species <- data[1].ntaxa()
+tip_names <- data[1].names()
+#n_sites <- data.nchar(1)
+
+mi = 0
+
+# For GTR
+
+for(i in 1:data.size()){
+      er_prior[i] <- v(1, 1, 1, 1, 1, 1)
+      er[i] ~ dnDirichlet(er_prior[i])
+      pi_prior[i] <- v(1, 1, 1, 1)
+      pi[i] ~ dnDirichlet(pi_prior[i])
+      moves[mi++] = mvSimplexElementScale(er[i], alpha=0.1, tune=false, weight=1.0)
+      moves[mi++] = mvSimplexElementScale(pi[i], alpha=0.1, tune=false, weight=1.0)
+      Q_gtr[i] := fnGTR(er[i], pi[i])
+
+      alpha_prior_min[i] <- 0.1
+      alpha_prior_max[i] <- 50.0
+      alpha[i] ~ dnUnif(alpha_prior_min[i], alpha_prior_max[i])
+      norm_gamma_rates[i] := fnDiscretizeGamma(alpha[i], alpha[i], 4, false)
+      moves[mi++] = mvScale(alpha[i], lambda = 10.0, tune = false, weight = 1.0)
+}
+
+######################################################################
+# For JC
+#pi := simplex(0.25, 0.25, 0.25, 0.25)
+#er := simplex(1, 1, 1, 1, 1, 1)
+#Q_JC := fnGTR(er, pi)
+
+# For HKY
+#pi ~ dnDirichlet(v(1, 1, 1, 1))
+#moves[mi++] = mvSimplexElementScale(pi)
+#tv ~ dnExp(1)
+#er := simplex(tv, 1, tv, tv, 1, tv)
+#moves[mi++] = mvScale(tv, lambda = 1, tune = false, weight = 1)
+#Q_hky := fnGTR(er, pi)
+######################################################################
+
+
+##################################################################################
+# Tree model: uniform topology prior, exponential distribution on branch lengths #
+##################################################################################
+
+topology ~ dnUniformTopology(n_species, tip_names)
+moves[mi++] = mvNNI(topology, weight = 1.0)
+n_branches <- 2 * n_species - 3
+
+for(i in 1:n_branches){
+      br_lens[i] ~ dnExponential(10.0)
+      moves[mi++] = mvScale(br_lens[i], lambda = 1, tune = true, weight = 1)
+}
+
+TL := sum(br_lens)
+
+phylogeny := treeAssembly(topology, br_lens)
+
+# here paste the block that sets up a partition substitution model!
+# (you can also put that model partition into a separate file and just call it here
+# using source("substitutionFile.Rev") or similar.)
+
+###########################
+# PARTITION BRANCH LENGTHS
+###########################
+#for(i in 1:data.size()){
+# branch_lengths[i] <- 1
+# for(k in 1:n_branches){
+#      br_lens[i][k]
+# }
+#}
+
+
+
+
+
+
+#######################################
+# PhyloCTMC Models for each partition #
+#######################################
+
+# fill in the right parameters for the dnPhyloCTMC function and the clamp function on the resulting object!
+n_parts <- data.size()
+for (i in 1:n_parts){
+  phyloSeq[i] ~ dnPhyloCTMC(tree = phylogeny, Q = Q_gtr[i], branchRates = 1.0, siteRates= norm_gamma_rates[i], type="DNA")
+  phyloSeq[i].clamp(data[i])
+}
+
+
+#############
+# THE Model #
+#############
+
+mymodel = model(topology)
+
+##########################
+# Customizing the Output #
+##########################
+parFileName = "Hym_partitioned.log"
+treeFileName = "Hym_partitioned.trees"
+
+monitor[1] = mnModel(filename=parFileName,printgen=1000, separator = " ")		
+monitor[2] = mnFile(filename=treeFileName,printgen=1000, separator = " ", phylogeny)	
+monitor[3] = mnScreen(printgen = 10, alpha, TL)
+monitor[4] = mnFile(filename = "Q.txt", printgen = 1000, separator = "	", Q_gtr[1])
+
+#########################
+# MCMC settings and run #
+#########################
+
+mymcmc = mcmc(mymodel, monitor, moves, moveschedule="single")
+mymcmc.run(generations=10000)				
+
+####################
+# some summarizing #
+####################
+pt = readTrace(parFileName, delimiter=" ")
+pt
+
+tt = readTreeTrace(treeFileName, "non-clock", " ")
+consensusTree(tt, "Hym_partitioned_consensus.tre", 0.5)

@@ -1,0 +1,338 @@
+#############################################################################
+#  RUNNING MARKOV CHAIN MONTE CARLO (MCMC) SIMULATIONS & ASSESSING OUTPUT   #
+#																			#
+#  Tutorial Tuesday 18th November 2014, University of Adelaide				#
+#																			#
+#  Led by:																	#
+#  Kate Sanders & Simon Tierney												#
+#																			#
+#  Authors: 																#
+#  Simon Tierney, Seraina Klopfstein, Tracy A. Heath, Michael Landis,  		#
+#  Sebastian Hoehna & Brian R. Moore										#
+#																			#
+#############################################################################
+
+
+##########
+#  AIM   #
+##########
+
+#  For this tutorial we will examine the behaviour of the MCMC.
+
+#  We will do this in 2 ways:
+#		(1)	Visually examining the output of RevBayes, using "Tracer"
+#				(a) ESS - Effective Sample Size
+#
+#		(2)	Examining post-hoc convergence diagnostics, namely
+#				(a) ASDSF - Average Standard Deviations of Spilt Frequencies
+#				(b) PSRF - 	Potential Scale Reduction Factor
+
+#  Keep an eye out for:
+#		Badly mixed chains
+#		Poor MCMC performance
+#		Correlated parameter estimates
+
+
+##########
+#  DATA  #
+##########
+
+#  13 species of beech tree (genus Fagus)
+
+#  2576 nucleotide sites
+
+#  3 gene regions:
+#  1 nuclear gene region (ITS)
+#  2 chloroplast gene regions (rbcL & matK)
+
+
+###########
+#  MODEL  #
+###########
+
+#  GTR+I+G
+
+#  MODEL TYPE:						
+#  GTR     (General Time Reversible Model) 	
+
+#  ACROSS-SITE RATE VARIATION:		
+#  I		(Proportion of invariant sites)
+#  G	 	(Gamma distribution)
+
+
+########################
+#  PARTITIONING SCHEME #
+########################
+
+# Uniform scheme, shared evenly across all sites of the matrix
+
+
+#  Launch RevBayes 
+#./rb
+
+
+#########################################
+#  	ANALYSIS 1							#
+#										#
+#	UNIFORM GTR+I+G						#
+#										#
+#	SINGLE MOVE PER GENERATION			#
+#										#
+#	LARGE PROPOSALS FOR ALL PARAMETERS	#
+#										#
+#	NO BURN-IN							#
+#										#
+#########################################
+
+
+# Runs the full MCMC on the single gene partition model
+
+####################
+# Load data files  #
+####################
+
+# Read in sequence data for all three genes, from any nexus file with a 'data' block
+# Other blocks present in the file, e.g., MrBayes or Paup blocks, are ignored.
+data_ITS <- readDiscreteCharacterData("fagus_ITS.nex")
+data_rbcL <- readDiscreteCharacterData("fagus_rbcL.nex")
+data_matK <- readDiscreteCharacterData("fagus_matK.nex")
+
+
+# Create concatenated data matrix called 'data'
+data <- data_ITS + data_rbcL + data_matK
+
+
+# View the data
+data
+
+
+# To learn more about the data object, use the structure command 'str()'
+str(data)
+
+
+# Get some useful variables from the data. We need these later on.
+n_species <- data.ntaxa()
+n_sites <- data.nchar(1)
+names <- data.names()
+
+
+# Add a counter which is incremented each time we add a move
+mi = 0
+
+
+##########################################################################
+# Specify the GTR+I+G substitution model applied uniformly to all sites  #
+##########################################################################
+
+# 'er' stands for the exchangeability rates (6 under the GTR model)
+# constant variable specifying the prior choice for the substitution rates
+er_prior <- v(1,1,1,1,1,1)
+
+
+# Next we define the stochastic variable 'er'; distributed according to a Dirichlet prior
+er ~ dnDirichlet(er_prior)
+
+
+# Then we add a move that will change this variable during the MCMC.
+# The specified move scales variables that are of form 'simplex', i.e., they add up to one.
+moves[mi++] = mvSimplexElementScale(er, alpha=0.1, tune=false, weight=1.0)
+
+
+# 'pi' stands for the stationary state frequencies of - in our case - the four 
+# nucleotides A, C, G, T
+pi_prior <- v(1,1,1,1)
+pi ~ dnDirichlet(pi_prior)
+moves[mi++] = mvSimplexElementScale(pi, alpha=0.1, tune=false, weight=1.0)
+
+
+########################################################
+# Create a deterministic variable for the rate matrix  #
+########################################################
+
+# The function 'gtr()' creates a matrix of form GTR, based on the stationary state
+# frequencies pi and the instanteneous substitution rates er which we have created before.
+Q := fnGTR(er,pi)
+
+
+##############################
+# Among site rate variation  #
+##############################
+
+# we aim to model among-site rate variation through a gamma distribution, with 
+# parameter alpha.
+# for alpha, we define a uniform prior between 0.1 (=very uneven rates) and 50 
+# (rates of all sites almost the same)
+alpha_prior_min <- 0.1
+alpha_prior_max <- 50.0
+alpha ~ dnUnif( alpha_prior_min, alpha_prior_max )
+
+
+# now we define a deterministic variable which will take the 4 (discretized) categories 
+# that approximate the Gamma distribution as defined by alpha
+norm_gamma_rates := fnDiscretizeGamma( alpha, alpha, 4, false )
+
+
+# add moves for the stationary frequencies, exchangeability rates and the shape parameter
+moves[mi++] = mvScale(alpha, lambda=10.0, tune=false, weight=1.0)
+
+
+# in addition to the Gamma among-site rate variation, we also add a proportion of 
+#invariant sites to the model
+# a beta(1,1) prior is added on the proportion of invariant sites
+pinvar ~ dnBeta(1,1)
+
+
+# add moves for the probability of a site being invariable
+moves[mi++] = mvScale(pinvar, lambda=10.0, tune=false, weight=1.0)
+
+
+###########################################
+# Tree model: Topology and Branch lengths #
+###########################################
+
+# Specify a uniform prior on the tree topology
+topology ~ dnUniformTopology(n_species, names)
+
+
+# moves on the tree
+moves[mi++] = mvNNI(topology, weight=1.0)
+
+
+###################################################
+# Specify a prior and moves on the branch lengths # 
+###################################################
+
+# calculate the number of branches in an unrooted tree
+n_branches <- 2 * n_species - 3
+
+
+# create a random variable for each branch length using a for loop
+for (i in 1:n_branches) {
+  # We use here the exponential distribution with rate 1.0 as the branch length prior
+  br_lens[i] ~ dnExponential(10.0)
+  
+  # Add a move for the branch length. We just take a simple scaling move since the value is a positive real number.
+  moves[mi++] = mvScale(br_lens[i],lambda=1,tune=true,weight=1) 
+}
+
+TL := sum(br_lens)
+
+
+# Build the tree by combining the topology with the branch length.
+phylogeny := treeAssembly(topology, br_lens)
+
+###################
+# PhyloCTMC Model #	
+###################	
+
+# PhyloCTMC = Phylogenetic Continuous-Time Markov Chain -> meaning we assume that the sequences evolved on a tree structure
+# according to a continous-time Markov substitution process (the basic assumption of most phylogenetic analyses)
+
+# the sequence evolution model is denoted as
+phyloSeq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, siteRates=norm_gamma_rates, pInv=pinvar, type="DNA")
+
+
+# attach the data
+phyloSeq.clamp(data)
+
+
+#############
+# The Model #
+#############
+
+mymodel = model(pi)
+
+
+# At this point the data file model parameters have been loaded
+
+
+##########################
+# Customizing the Output #
+##########################
+
+monitor[1] = mnModel(filename="simon_mcmc_posterior_run1.log",printgen=10, separator = " ")
+monitor[2] = mnFile(filename="simon_mcmc_posterior_run1.trees",printgen=10, separator = " ", phylogeny)
+monitor[3] = mnScreen(printgen=10, alpha, TL, pinvar)
+
+
+#########################
+# MCMC settings and run #
+#########################
+
+mymcmc = mcmc(mymodel, monitor, moves, moveschedule="single")
+
+
+mymcmc.run(generations=10000)
+
+##########
+# Trees  #
+##########
+
+# Analyze the tree output, by reading in the tree trace
+treetrace = readTreeTrace("simon_mcmc_posterior_run1.trees", "non-clock", " ")
+
+# and get the summary of the tree trace
+treetrace.summarize()
+
+#Map the tree
+mapTree(treetrace,"simon_mcmc_run1.tree")
+
+#Create a consensus tree with default 25% burn-in and 30% cut-off
+consensusTree(treetrace,"simon_r1_Consensus.tre", 0.3)
+
+
+#########################
+#  Summarise the moves  #
+#########################
+
+# The operator summary provides you with an overview of the moves that you have used for 
+# this MCMC run. It tells you what the weight for each move was, the variables it has been 
+# working on, the number of times the move was used, and how often the move was accepted. 
+# Good acceptance rates for continuous parameters are between 20% and 60%. For discrete 
+# characters, such as the phylogeny, there is no rule of thumb what good acceptance is. 
+# Instead, the acceptance rate of tree topology proposal strongly depends on the current 
+# data.
+
+mymcmc.operatorSummary()
+
+########
+# Quit # 
+########
+
+# Quit out of RevBayes
+# q()
+
+
+############
+#  TRACER  #
+############
+
+# Now open the output file in Tracer.
+# fileneame is 'simon_mcmc_posterior_run1.log'
+
+
+
+##############
+#  FIGTREE	 #
+##############
+
+# View trees in FigTree
+
+
+################
+#  BATCH FILE  #
+################
+
+# To source this text as a batch file:
+#source("simon_mcmc.Rev")
+
+
+
+
+
+
+
+
+
+
+

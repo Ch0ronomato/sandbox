@@ -1,0 +1,40 @@
+clear()
+
+#Make stochastic mode
+x ~ dnNorm(0.0, 1.0)
+
+# save stochastic node into a variable to use as a model
+myModel = model(x)
+
+# Save moves
+moves[1] = mvSlide(x)
+
+# save screen and log file monitors
+monitors[1] = mnScreen(x)
+monitors[2] = mnFile(x, filename = "output_1.txt")
+
+#myMcmc = mcmc(myModel, monitors, moves)
+#myMcmc.run(100)
+
+# 2.8 Deterministic nodes
+clear()
+a <- 1
+b <- exp(a)
+
+c := exp(a)
+
+clear()
+prec ~ dnGamma(1.0E-3, 1.0E-3)
+mean ~ dnNorm(0.0, 0.5)
+
+sd := sqrt(1.0 / prec)
+x ~ dnNorm(mean, sd)
+
+model2 = model(x)
+moves2[1] = mvSlide(x)
+
+monit[1] = mnScreen(x)
+monit[2] = mnFile(x, filename = "output_2.txt")
+
+#myMcmc_2 = mcmc(model2, monit, moves2)
+#myMcmc_2.run(10000)

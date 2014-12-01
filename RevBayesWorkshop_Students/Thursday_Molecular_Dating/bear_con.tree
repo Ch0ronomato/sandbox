@@ -1,0 +1,21 @@
+#NEXUS
+
+	Begin taxa;
+	Dimensions ntax=10;
+	Taxlabels
+		Ailuropoda_melanoleuca
+		Canis_lupus
+		Helarctos_malayanus
+		Melursus_ursinus
+		Phoca_largha
+		Tremarctos_ornatus
+		Ursus_americanus
+		Ursus_arctos
+		Ursus_maritimus
+		Ursus_thibetanus
+		;
+End;
+
+Begin trees;
+tree TREE1 = [&R](Canis_lupus:47.929148,(Phoca_largha:37.688187,(Ailuropoda_melanoleuca:19.831961,(Tremarctos_ornatus:9.843578,(Melursus_ursinus:4.744529,((Helarctos_malayanus:2.463407,(Ursus_thibetanus:1.566807,Ursus_americanus:1.566807)[&posterior=1.000000]:0.896620)[&posterior=1.000000]:0.785876,(Ursus_maritimus:1.295580,Ursus_arctos:1.295580)[&posterior=1.000000]:1.953673)[&posterior=1.000000]:1.495266)[&posterior=1.000000]:5.098949)[&posterior=1.000000]:9.988453)[&posterior=1.000000]:17.856226)[&posterior=1.000000]:10.240941)[&posterior=1.000000]:0.000000;
+End;

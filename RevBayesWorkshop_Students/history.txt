@@ -1,0 +1,100 @@
+source("mix_models.Rev")
+mymodel
+mv
+mvMixtureAllocation(1.0)
+a ~mvMixtureAllocation(1.0)
+a ~ mvMixtureAllocation(1.0)
+a = mvMixtureAllocation(1.0)
+a
+index
+str(index)
+source("mix_models.Rev")
+str(index)
+index
+index.redraw()
+index
+?movex
+quit()
+source("mix_models.Rev")
+mvRandomIntegerWalk
+source("mix_models.Rev")
+index
+mvRandomIntegerWalk(1)
+mvRandomIntegerWalk(index)
+vals[1]
+vals[2]
+index
+index.redraw()
+index
+index.redraw()
+index
+index.redraw()
+index
+mvRandomIntegerWalk(index)
+source("mix_models.Rev")
+dnBernoulli(0.5)
+a <- dnBernoulli(0.5)
+a = dnBernoulli(0.5)
+a
+sample
+source("mix_models.Rev")
+index
+index.redraw()
+index
+index.redraw()
+index
+source("mix_models.Rev")
+index
+source("mix_models.Rev")
+wow <- function(x){x *x}
+wow = function(x){x *x}
+wow := function(x){x *x}
+wow = function(x){x * x}
+wow <- function(x){x * x}
+function myfun(x){x * x}
+myfun(9)
+source("mix_models.Rev")
+rbernoulli
+rbernoulli(0)
+rbernoulli(p = 0.5)
+source("mix_models.Rev")
+get_ind(6)
+source("mix_models.Rev")
+get_ind(0)
+get_ind(3)
+get_ind(5)
+source("mix_models.Rev")
+get_ind(5)
+get_ind
+get_ind()
+source("mix_models.Rev")
+get_ind()
+source("mix_models.Rev")
+get_ind()
+source("mix_models.Rev")
+dnBernoulli
+source("mix_models.Rev")
+index
+index.redraw()
+index
+index.redraw()
+index
+next_i := index + 1
+next_1
+next_i
+source("mix_models.Rev")
+index
+index.redraw()
+index
+index.redraw()
+index
+index.redraw()
+index
+index.redraw()
+index
+index.redraw()
+index
+index.redraw()
+index
+vals.size()
+q()

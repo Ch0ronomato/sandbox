@@ -1,0 +1,100 @@
+dnLNo
+dnLnorm
+source("Bears_skeletal.Rev")
+dnLnorm
+mean
+sigma
+root_time ~ dnLnorm(mean = MU, sd = sigma, offset = 38)
+root_time ~ dnLnorm(mean = MU, sd = 0.25, offset = 38)
+root_time ~ dnLnorm(mean = 33, sd = 0.25, offset = 38)
+root_time ~ dnLnorm(mean = 33, sd = 0.25, offset = 3)
+root_time ~ dnLnorm(mean = 33, sd = 0.25)
+root_time ~ dnLnorm(mean = 33, sd = 0.25, offset = 30)
+root_time ~ dnLnorm(MU, sigma, offset=38)
+MU
+source("Bears_skeletal.Rev")
+root_time
+source("Bears_skeletal.Rev")
+T
+clade
+source("Bears_skeletal.Rev")
+clade_UrsPinn
+type(clade_UrsPinn)
+str(clade_UrsPinn)
+constraints
+str(constraints)
+source("Bears_skeletal.Rev")
+birth_rate
+death_rate
+timetree ~ dnBDP(lambda=birth_rate, mu=death_rate, rho=rho, rootAge=root_time, samplingStrategy="uniform", condition="nTaxa", nTaxa=n_taxa, names=names)
+tree ~ dnBDP(lambda = 1.0, mu = 0.5, rho = 1.0, root_age = 3.0)
+tree ~ dnBDP(lambda = 1.0, mu = 0.5, rho = 1.0, root_age = 3.0, condition = "nTaxa", nTaxa = n_taxa, names = names)
+tree ~ dnBDP(lambda = 1.0, mu = 0.5, rho = 1.0, root_age = 3.0, condition = "nTaxa", nTaxa = 20.0, names = names)
+names
+source("Bears_skeletal.Rev")
+n_taxa
+names
+names.size()
+source("Bears_skeletal.Rev")
+rho
+source("Bears_skeletal.Rev")
+timetree
+source("Bears_skeletal.Rev")
+rho
+source("Bears_skeletal.Rev")
+tmrca_Ursidae
+n_tmrca_Ursidae
+source("Bears_skeletal.Rev")
+n_tmrca_Ursidae
+n_TMRCA_Ursidae
+source("Bears_skeletal.Rev")
+dnGamma
+dnGamma(1)
+dnGamma(1, 1)
+source("Bears_skeletal.Rev")
+q()
+source("Bears_skeletal.Rev")
+mymodel
+source("Bears_skeletal.Rev")
+mymodel
+source("Bears_skeletal.Rev")
+constratits
+constraints
+timetree
+str(timetree)
+q()
+source("Bears_skeletal_copy.Rev")
+timetree
+methods(timetree)
+timetree.setvalue()
+timetree.methods
+()
+timetree.methods()
+source("Bears_skeletal_copy.Rev")
+q()
+source("Bears_skeletal_copy.Rev")
+timetree\\
+timetree
+timetree.setValue(T)
+T
+time_tree[1].setValue(T)
+timetree[1].setValue(T)
+timetree[1]
+vals
+timetree
+timetree_1
+timetree_1.setValue(T)
+source("Bears_skeletal_copy.Rev")
+source("Bears_skeletal.Rev")
+source("Bears_skeletal_copy.Rev")
+dnCat(v(1, 1))
+dndCat(v(1, 1))
+q()
+dnCat(v(1, 1))
+dnCat(v(1.0, 1.0))
+dnCat(simplex(1, 1))
+source("Bears_skeletal_copy.Rev")
+dnUniformTimeTree
+source("Bears_skeletal_copy.Rev")
+source("/Users/sebastianducheneAIr/Downloads/revbayes-adelaide_workshop/projects/cmake/mix_models.Rev")
+q()

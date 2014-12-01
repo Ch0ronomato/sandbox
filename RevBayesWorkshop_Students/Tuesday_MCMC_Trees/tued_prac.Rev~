@@ -1,0 +1,78 @@
+clear()
+
+data_ITS <- readDiscreteCharacterData("fagus_ITS.nex")
+data_rbcL <- readDiscreteCharacterData("fagus_rbcL.nex")
+data_matK <- readDiscreteCharacterData("fagus_matK.nex")
+
+data <- data_ITS + data_rbcL + data_matK
+
+n_species <- data.ntaxa()
+n_sites <- data.nchar(1)
+names <- data.names()
+
+mi = 0
+
+er_prior <- v(1, 1, 1, 1, 1, 1)
+er ~ dnDirichlet(er_prior)
+
+pi_prior <- v(1, 1, 1, 1)
+pi ~ dnDirichlet(pi_prior)
+moves[mi++] = mvSimplexElementScale(pi, alpha = 0.1, tune = false, weight = 1.0)
+
+
+
+Q := fnGTR(er, pi)
+
+alpha_prior_min <- 0.1
+alpha_prior_max <- 50.0
+alpha ~ dnUnif(alpha_prior_min, alpha_prior_max)
+
+# Draw the category rates from arbitrary distribution with flexible categories
+##########
+#rateprops ~ dnDirichlet( v(1,1,1,1) )
+
+
+#category_rates ~ dnOrderStat( dnDirichlet( v(1,1,1,1) ) )
+############
+
+norm_gamma_rates := fnDiscretizeGamma(alpha, alpha, 1, false)
+
+moves[mi++] = mvScale(alpha, lambda = 10.0, tune = false, weight = 1.0)
+
+pi_invar_prior <- 1
+pinvar ~ dnBeta(pi_invar_prior, pi_invar_prior)
+
+moves[mi++] = mvScale(pinvar, lambda  = 10.0, tune = false, weight = 1.0)
+
+topology ~ dnUniformTopology(n_species, names)
+moves[mi++] = mvNNI(topology, weight = 1.0)
+
+n_branches <- 2 * n_species - 3
+
+for(i in 1:n_branches){
+      br_lens[i] ~ dnExponential(10.0)
+      moves[mi++] = mvScale(br_lens[i], lambda = 1, tune = true, weight = 1)
+}
+
+TL := sum(br_lens)
+
+phylogeny := treeAssembly(topology, br_lens)
+phyloSeq ~ dnPhyloCTMC(tree = phylogeny, Q = Q, siteRates = norm_gamma_rates, pInv = pinvar, type = "DNA")
+
+phyloSeq.clamp(data)
+
+mymodel = model(phylogeny)
+
+monitor[1] = mnModel(filename = "mcmc_posterior_run1.log", printgen = 10, separator = "	")
+
+monitor[2] = mnFile(filename = "mcmc_posterior_run1.trees", printgen = 10, separator = " ", phylogeny)
+
+monitor[3] = mnScreen(printgen = 10, alpha, TL, pinvar)
+
+mymcmc = mcmc(mymodel, monitor, moves, moveschedule = "single")
+mymcmc.run(generations = 10000)
+
+treetrace = readTreeTrace("mcmc_posterior_run1.trees", "non-clock", " ")
+treetrace.summarize()
+
+mapTree(treetrace, "mcmc_run1.tree")
