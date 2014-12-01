@@ -1,0 +1,4 @@
+error: RPC failed; result=18, HTTP code = 200
+fatal: The remote end hung up unexpectedly
+fatal: early EOF
+fatal: index-pack failed
