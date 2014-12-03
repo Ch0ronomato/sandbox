@@ -41,7 +41,7 @@ function get_ind(  ) {
 
 index ~ dnCat(simplex(1, 1, 1))
 #index.setValue(1)
-moves[mi++] = mvRandomIntegerWalk(index, weight = 10.0)
+moves[mi++] = mvRandomIntegerWalk(index, weight = 10.0, tune = true)
 
 #next_i := index + 1
 
