@@ -1,0 +1,17 @@
+library(ape)
+library(RSQLite)
+library(DBI)
+
+con <- dbConnect(RSQLite::SQLite(), 'my_trees.db')
+
+tree_set_1 <- data.frame(t_names = paste0('tree', 1:1000), newick = sapply(1:1000, function(x) write.tree(rtree(20))), stringsAsFactors = F)
+
+tree_set_2 <- data.frame(t_name = paste('tree', 1:1000), newick = sapply(1:1000, function(x) write.tree(rtree(20))), stringsAsFactors = F)
+
+dbWriteTable(conn = con, name = 'tree_set_1', value = tree_set_1)
+
+dbWriteTable(conn = con, name = 'tree_set_2', value = tree_set_2)
+
+dbDisconnect(con)
+
+#dbSendQuery(conn = con, 'CREATE TABLE tree_set_1 (t_name text, newick text)')
