@@ -1,4 +1,6 @@
 
+
+
 --ALTER table table_name--
 --add column_name data_type--
 --BEGIN;--

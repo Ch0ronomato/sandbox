@@ -1,7 +1,3 @@
-dnLNo
-dnLnorm
-source("Bears_skeletal.Rev")
-dnLnorm
 mean
 sigma
 root_time ~ dnLnorm(mean = MU, sd = sigma, offset = 38)
@@ -98,3 +94,7 @@ dnUniformTimeTree
 source("Bears_skeletal_copy.Rev")
 source("/Users/sebastianducheneAIr/Downloads/revbayes-adelaide_workshop/projects/cmake/mix_models.Rev")
 q()
+source("Bears_skeletal.Rev")
+consensusTree
+quit
+quit()

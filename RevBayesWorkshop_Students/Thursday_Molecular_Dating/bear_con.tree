@@ -17,5 +17,5 @@
 End;
 
 Begin trees;
-tree TREE1 = [&R](Canis_lupus:47.929148,(Phoca_largha:37.688187,(Ailuropoda_melanoleuca:19.831961,(Tremarctos_ornatus:9.843578,(Melursus_ursinus:4.744529,((Helarctos_malayanus:2.463407,(Ursus_thibetanus:1.566807,Ursus_americanus:1.566807)[&posterior=1.000000]:0.896620)[&posterior=1.000000]:0.785876,(Ursus_maritimus:1.295580,Ursus_arctos:1.295580)[&posterior=1.000000]:1.953673)[&posterior=1.000000]:1.495266)[&posterior=1.000000]:5.098949)[&posterior=1.000000]:9.988453)[&posterior=1.000000]:17.856226)[&posterior=1.000000]:10.240941)[&posterior=1.000000]:0.000000;
+tree TREE1 = [&R](Canis_lupus:46.834833,(Phoca_largha:41.588004,(((Ursus_americanus:16.942417,(Ailuropoda_melanoleuca:13.988434,Ursus_thibetanus:13.988434)[&posterior=1.000000]:2.953983)[&posterior=1.000000]:3.057137,(Tremarctos_ornatus:16.503130,(Melursus_ursinus:10.817992,Ursus_maritimus:10.817992)[&posterior=1.000000]:5.685138)[&posterior=1.000000]:3.496424)[&posterior=1.000000]:1.607775,(Ursus_arctos:17.007153,Helarctos_malayanus:17.007153)[&posterior=1.000000]:4.600176)[&posterior=1.000000]:19.980675)[&posterior=1.000000]:5.246829)[&posterior=1.000000]:0.000000;
 End;

@@ -190,7 +190,7 @@ monitors[2] = mnFile(filename="bears.trees",printgen=10, separator = "	", timetr
 monitors[3] = mnScreen(printgen=10, mean_rt, birth_rate, death_rate, root_time)								
 
 mymcmc = mcmc(mymodel, monitors, moves)		# set up an MCMC object with the model, monitors and moves
-#mymcmc.run(generations=1000)				# and now run it... This runs a single independent run, without Metropolis-coupling
+mymcmc.run(generations=1000)				# and now run it... This runs a single independent run, without Metropolis-coupling
 
 # Now, we will analyze the tree output.
 treetrace = readTreeTrace("bears.trees", treetype="clock") 	# we start by reading in the tree trace from the tree monitor file
