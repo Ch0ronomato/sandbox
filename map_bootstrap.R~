@@ -1,0 +1,14 @@
+args <- commandArgs(trailingOnly = TRUE)
+library(ape)
+
+tr <- read.tree(args[1])
+boot_trees <- read.tree(args[2])
+out_name = args[3]
+
+tr_labeled <- makeNodeLabel(tr)
+
+tr$node.label <- prop.clades(phy = tr, part = prop.part(boot_trees))
+write.tree(tr, file = out_name)
+
+cat('\nI saved the tree with bootstrap values in: ', getwd(), '/', out_name, '\n\n', sep = '')
+
