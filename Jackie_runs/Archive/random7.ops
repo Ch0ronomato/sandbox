@@ -1,0 +1,23 @@
+
+Operator analysis
+Operator                                          Tuning   Count      Time     Time/Op  Pr(accept) 
+scale(ac)                                         0.452   97577      108001   1.11     0.2602      
+scale(ag)                                         0.721   97987      106982   1.09     0.2403      
+scale(at)                                         0.582   96711      105569   1.09     0.2451      
+scale(cg)                                         0.258   97666      106553   1.09     0.2645      
+scale(gt)                                         0.469   97257      107985   1.11     0.2614      
+frequencies                                       0.026   97698      106586   1.09     0.2493      
+scale(alpha)                                      0.759   97351      105482   1.08     0.2348      
+scale(ucld.mean)                                  0.828   2921847    3186208  1.09     0.2273      
+scale(ucld.stdev)                                 0.783   2917976    3188354  1.09     0.2122      
+subtreeSlide(treeModel)                           54.931  14602568   3387828  0.23     0.2936      
+Narrow Exchange(treeModel)                                14601514   3015095  0.21     0.0491      
+Wide Exchange(treeModel)                                  2921303    595368   0.2      0.0014      
+wilsonBalding(treeModel)                                  2918289    1032203  0.35     0.0008      
+scale(treeModel.rootHeight)                       0.775   2921201    401504   0.14     0.2418      
+uniform(nodeHeights(treeModel))                           29203603   8404535  0.29     0.2057      
+scale(constant.popSize)                           0.419   2918734    16042    0.01     0.2523      
+up:ucld.mean down:nodeHeights(treeModel)          0.602   2920217    1871629  0.64     0.2448      
+swapOperator(branchRates.categories)                      9734919    3635252  0.37     0.2351      
+uniformInteger(branchRates.categories)                    9735582    2744884  0.28     0.37        
+

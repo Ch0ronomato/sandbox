@@ -1,0 +1,23 @@
+
+Operator analysis
+Operator                                          Tuning   Count      Time     Time/Op  Pr(accept) 
+scale(ac)                                         0.461   97280      114425   1.18     0.2698      
+scale(ag)                                         0.721   97368      114750   1.18     0.2444      
+scale(at)                                         0.593   97351      114546   1.18     0.2597      
+scale(cg)                                         0.27    97667      114719   1.17     0.2769      
+scale(gt)                                         0.48    97394      114449   1.18     0.276       
+frequencies                                       0.026   97471      114625   1.18     0.2399      
+scale(alpha)                                      0.766   96417      111710   1.16     0.2412      
+scale(ucld.mean)                                  0.828   2920817    3393687  1.16     0.2273      
+scale(ucld.stdev)                                 0.794   2922082    3394923  1.16     0.2257      
+subtreeSlide(treeModel)                           104.329 14603129   3237106  0.22     0.2207      
+Narrow Exchange(treeModel)                                14600562   3075510  0.21     0.0505      
+Wide Exchange(treeModel)                                  2922156    588623   0.2      0.0014      
+wilsonBalding(treeModel)                                  2922678    999736   0.34     0.0008      
+scale(treeModel.rootHeight)                       0.762   2918187    387574   0.13     0.2194      
+uniform(nodeHeights(treeModel))                           29203365   8618674  0.3      0.2079      
+scale(constant.popSize)                           0.417   2917377    16902    0.01     0.2506      
+up:ucld.mean down:nodeHeights(treeModel)          0.56    2921757    1938513  0.66     0.2186      
+swapOperator(branchRates.categories)                      9734420    3802192  0.39     0.2332      
+uniformInteger(branchRates.categories)                    9732522    3021102  0.31     0.3671      
+

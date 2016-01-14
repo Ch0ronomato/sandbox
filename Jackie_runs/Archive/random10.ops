@@ -1,0 +1,23 @@
+
+Operator analysis
+Operator                                          Tuning   Count      Time     Time/Op  Pr(accept) 
+scale(ac)                                         0.457   97372      115321   1.18     0.2638      
+scale(ag)                                         0.713   97284      115153   1.18     0.2345      
+scale(at)                                         0.56    97995      116101   1.18     0.2254      
+scale(cg)                                         0.272   97764      115863   1.19     0.2856      
+scale(gt)                                         0.471   97537      115304   1.18     0.2663      
+frequencies                                       0.026   97769      115782   1.18     0.2431      
+scale(alpha)                                      0.746   97040      113591   1.17     0.2183      
+scale(ucld.mean)                                  0.828   2917504    3418237  1.17     0.2275      
+scale(ucld.stdev)                                 0.796   2922905    3427312  1.17     0.2301      
+subtreeSlide(treeModel)                           99.698  14600834   3394399  0.23     0.2957      
+Narrow Exchange(treeModel)                                14596199   2992927  0.21     0.0507      
+Wide Exchange(treeModel)                                  2921477    582992   0.2      0.0014      
+wilsonBalding(treeModel)                                  2922786    1005812  0.34     0.0009      
+scale(treeModel.rootHeight)                       0.784   2918683    419078   0.14     0.2553      
+uniform(nodeHeights(treeModel))                           29204430   8569260  0.29     0.2028      
+scale(constant.popSize)                           0.415   2921530    16885    0.01     0.249       
+up:ucld.mean down:nodeHeights(treeModel)          0.533   2920579    2041621  0.7      0.2345      
+swapOperator(branchRates.categories)                      9739331    3706549  0.38     0.2319      
+uniformInteger(branchRates.categories)                    9730981    2734145  0.28     0.3653      
+

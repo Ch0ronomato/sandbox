@@ -1,0 +1,23 @@
+
+Operator analysis
+Operator                                          Tuning   Count      Time     Time/Op  Pr(accept) 
+scale(ac)                                         0.462   97339      105938   1.09     0.2753      
+scale(ag)                                         0.727   96770      105087   1.09     0.2501      
+scale(at)                                         0.592   97429      107163   1.1      0.2534      
+scale(cg)                                         0.271   97647      106072   1.09     0.2824      
+scale(gt)                                         0.468   97316      105801   1.09     0.2608      
+frequencies                                       0.026   97124      105632   1.09     0.2537      
+scale(alpha)                                      0.753   97605      105267   1.08     0.2257      
+scale(ucld.mean)                                  0.829   2919150    3147108  1.08     0.2286      
+scale(ucld.stdev)                                 0.784   2919647    3159298  1.08     0.2219      
+subtreeSlide(treeModel)                           25.616  14600866   3181823  0.22     0.2454      
+Narrow Exchange(treeModel)                                14604111   2870080  0.2      0.0495      
+Wide Exchange(treeModel)                                  2922148    532877   0.18     0.0014      
+wilsonBalding(treeModel)                                  2922449    972420   0.33     0.0008      
+scale(treeModel.rootHeight)                       0.785   2917928    380744   0.13     0.2504      
+uniform(nodeHeights(treeModel))                           29205701   8275190  0.28     0.2069      
+scale(constant.popSize)                           0.415   2920145    15883    0.01     0.2475      
+up:ucld.mean down:nodeHeights(treeModel)          0.77    2919824    1808976  0.62     0.2333      
+swapOperator(branchRates.categories)                      9735794    3489669  0.36     0.2461      
+uniformInteger(branchRates.categories)                    9731007    2624644  0.27     0.3822      
+

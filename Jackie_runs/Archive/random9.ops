@@ -1,0 +1,23 @@
+
+Operator analysis
+Operator                                          Tuning   Count      Time     Time/Op  Pr(accept) 
+scale(ac)                                         0.455   97356      96196    0.99     0.2646      
+scale(ag)                                         0.713   97584      96296    0.99     0.2332      
+scale(at)                                         0.584   97024      95755    0.99     0.2502      
+scale(cg)                                         0.271   97526      96302    0.99     0.2812      
+scale(gt)                                         0.474   97027      95808    0.99     0.2629      
+frequencies                                       0.025   97451      96248    0.99     0.257       
+scale(alpha)                                      0.757   97592      95424    0.98     0.2355      
+scale(ucld.mean)                                  0.825   2919975    2859411  0.98     0.2213      
+scale(ucld.stdev)                                 0.798   2919104    2858652  0.98     0.2321      
+subtreeSlide(treeModel)                           122.575 14604487   2859350  0.2      0.2334      
+Narrow Exchange(treeModel)                                14604755   2676354  0.18     0.0505      
+Wide Exchange(treeModel)                                  2916609    512382   0.18     0.0014      
+wilsonBalding(treeModel)                                  2918211    888039   0.3      0.0008      
+scale(treeModel.rootHeight)                       0.756   2921257    355050   0.12     0.2131      
+uniform(nodeHeights(treeModel))                           29203461   7560594  0.26     0.2043      
+scale(constant.popSize)                           0.412   2920073    14676    0.01     0.246       
+up:ucld.mean down:nodeHeights(treeModel)          0.538   2920869    1676186  0.57     0.225       
+swapOperator(branchRates.categories)                      9737965    3404941  0.35     0.233       
+uniformInteger(branchRates.categories)                    9731674    2550125  0.26     0.3677      
+
